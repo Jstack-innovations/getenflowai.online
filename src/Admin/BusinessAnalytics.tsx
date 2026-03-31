@@ -15,7 +15,7 @@ import {
   Legend,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
-import "./BusinessAnalytics.css";
+import "./Css/BusinessAnalytics.css";
 
 const COLORS = ["#d4af37", "#111", "#a0522d"];
 
