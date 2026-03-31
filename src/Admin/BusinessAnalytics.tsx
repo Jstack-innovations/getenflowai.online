@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import "./Css/BusinessAnalytics.css";
+import { API_BASE } from "../Config/api";
+
 
 const COLORS = ["#d4af37", "#111", "#a0522d"];
 
@@ -41,7 +43,7 @@ const handleSendReport = async () => {
   setSendingReport(true); // start sending
   try {
     const res = await fetch(
-      "https://artisangrills-production.up.railway.app/sendReport",
+      `${API_BASE}/sendReport`,
       { method: "GET", credentials: "include" }
     );
 
@@ -67,7 +69,7 @@ const handleSendReport = async () => {
 useEffect(() => {
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch("https://artisangrills-production.up.railway.app/getAnalytics", {
+      const res = await fetch(`${API_BASE}/getAnalytics`, {
         credentials: "include",
       });
 
