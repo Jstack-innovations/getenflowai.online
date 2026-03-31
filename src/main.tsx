@@ -17,6 +17,7 @@ import AdminUsers from "./Admin/AdminUsers.tsx";
 import OrderScanner from "./Admin/OrderScanner.tsx";
 import Offers from "./Admin/Offers.tsx";
 import Banner from "./Admin/Banner.tsx";
+import BusinessAnalytics from "./Admin/BusinessAnalytics.tsx";
 
 const root = document.getElementById("root");
 
@@ -42,6 +43,7 @@ if (root) {
           <Route path="/scanner" element={<OrderScanner />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/banners" element={<Banner />} />
+          <Route path="/analytics" element={<BusinessAnalytics />} />
 
         </Routes>
       </BrowserRouter>
