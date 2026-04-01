@@ -202,6 +202,7 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
         <a href="/scanner">Scan Artisan Items</a>
         <a href="/offers">Set Artisanè Offers</a>
         <a href="/banners">Set Artisanè Banner</a>
+        <a href="/analytics">See Business Analysis</a>
       </nav>
 
       <button
@@ -238,6 +239,7 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
       <a href="/scanner">Scan Artisan Items</a>
       <a href="/offers">Set Artisanè Offers</a>
       <a href="/banners">Set Artisanè Banner</a>
+      <a href="/analytics">See Business Analysis</a>
     </div>
 
     <div className="bi-wrapper">
