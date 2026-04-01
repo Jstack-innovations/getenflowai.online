@@ -50,13 +50,12 @@ interface Order {
   };
   items: OrderItem[];
 }
-
 const COLORS = ["#d4af37", "#111", "#a0522d"];
+
 
 export default function BusinessIntelligence() {
   
-  const navigate = useNavigate();
-  
+const navigate = useNavigate();
 const [menuOpen, setMenuOpen] = useState(false);
 
   
