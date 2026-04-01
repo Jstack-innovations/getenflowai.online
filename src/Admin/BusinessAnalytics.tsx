@@ -408,8 +408,11 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="hour" />
               <YAxis />
-              <Tooltip formatter={(value) => `₦${value.toLocaleString()}`} />
-              <Line
+              <Tooltip
+  formatter={(value: number | string) =>
+    `₦${Number(value).toLocaleString()}`
+  }
+/>          <Line
                 type="monotone"
                 dataKey="revenue"
                 stroke="#111"
@@ -430,9 +433,9 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie data={orderTypes} dataKey="value" outerRadius={90}>
-          {orderTypes.map((entry, index) => (
-            <Cell key={index} fill={COLORS[index % COLORS.length]} />
-          ))}
+          {orderTypes.map((_, index) => (
+  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+))}
         </Pie>
         <Legend />
       </PieChart>
@@ -455,7 +458,11 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="day" angle={-30} textAnchor="end" interval={0} />
           <YAxis />
-          <Tooltip formatter={(value) => `₦${value.toLocaleString()}`} />
+          <Tooltip
+  formatter={(value: number | string) =>
+    `₦${Number(value).toLocaleString()}`
+  }
+/>
           <Legend />
           <Bar dataKey="revenue" fill="#d4af37" radius={[6, 6, 0, 0]} />
           <Bar dataKey="cost" fill="#a0522d" radius={[6, 6, 0, 0]} />
