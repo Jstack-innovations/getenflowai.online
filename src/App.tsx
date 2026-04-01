@@ -177,6 +177,7 @@ export default function PaidOrders() {
         <a href="/scanner">Scan Artisan Items</a>
        <a href="/offers">Set Artisanè Offers</a>
        <a href="/banners">Set Artisanè Banner</a>
+       <a href="/analytics">See Business Analysis</a>
         </nav>
 
 <button
