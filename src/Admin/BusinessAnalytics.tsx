@@ -61,14 +61,11 @@ const [menuOpen, setMenuOpen] = useState(false);
 
   
   // ===== REVENUE DATA FROM BACKEND =====
-  const [revenueData, setRevenueData] = useState([]);
+const [revenueData, setRevenueData] = useState<RevenueDay[]>([]);
+const [hourlyRevenue, setHourlyRevenue] = useState<HourlyRevenue[]>([]);
+const [orderTypes, setOrderTypes] = useState<OrderType[]>([]);
+const [topItems, setTopItems] = useState<TopItem[]>([]);
   
-  const [hourlyRevenue, setHourlyRevenue] = useState([]);
-  
-  const [orderTypes, setOrderTypes] = useState([]);
-  
-const [topItems, setTopItems] = useState([]);
-
 const [sendingReport, setSendingReport] = useState(false);
 
 const handleSendReport = async () => {
