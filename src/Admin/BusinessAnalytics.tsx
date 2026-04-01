@@ -112,10 +112,10 @@ useEffect(() => {
       setRevenueData(data.dailyRevenue || []);
       setHourlyRevenue(data.hourlyRevenue || []);
 
-      const ordersArray = Object.values(data.orders || {});
+      const ordersArray = Object.values(data.orders || {}) as Order[];
 
       // Order Types
-      const typesCount = ordersArray.reduce((acc, order) => {
+      const typesCount = ordersArray.reduce<Record<string, number>>((acc, order) => {
         const type = order.info.order_type || "unknown";
         acc[type] = (acc[type] || 0) + 1;
         return acc;
