@@ -409,10 +409,11 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
               <XAxis dataKey="hour" />
               <YAxis />
               <Tooltip
-  formatter={(value: number | string) =>
-    `₦${Number(value).toLocaleString()}`
+  formatter={(value: number | string | undefined, name?: string, props?: any) =>
+    value !== undefined ? `₦${Number(value).toLocaleString()}` : "-"
   }
-/>          <Line
+/>
+              <Line
                 type="monotone"
                 dataKey="revenue"
                 stroke="#111"
@@ -459,8 +460,8 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
           <XAxis dataKey="day" angle={-30} textAnchor="end" interval={0} />
           <YAxis />
           <Tooltip
-  formatter={(value: number | string) =>
-    `₦${Number(value).toLocaleString()}`
+  formatter={(value: number | string | undefined, name?: string, props?: any) =>
+    value !== undefined ? `₦${Number(value).toLocaleString()}` : "-"
   }
 />
           <Legend />
