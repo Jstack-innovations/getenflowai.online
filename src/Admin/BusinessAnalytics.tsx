@@ -409,9 +409,16 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
               <XAxis dataKey="hour" />
               <YAxis />
               <Tooltip
-  formatter={(value: number | string | undefined, name?: string, props?: any) =>
-    value !== undefined ? `₦${Number(value).toLocaleString()}` : "-"
-  }
+  formatter={(value: any) => {
+    if (Array.isArray(value)) {
+      // multiple values (stacked or grouped chart)
+      return value.map((v) => `₦${Number(v).toLocaleString()}`).join(", ");
+    } else if (value !== undefined && value !== null) {
+      return `₦${Number(value).toLocaleString()}`;
+    } else {
+      return "-";
+    }
+  }}
 />
               <Line
                 type="monotone"
@@ -460,9 +467,16 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
           <XAxis dataKey="day" angle={-30} textAnchor="end" interval={0} />
           <YAxis />
           <Tooltip
-  formatter={(value: number | string | undefined, name?: string, props?: any) =>
-    value !== undefined ? `₦${Number(value).toLocaleString()}` : "-"
-  }
+  formatter={(value: any) => {
+    if (Array.isArray(value)) {
+      // multiple values (stacked or grouped chart)
+      return value.map((v) => `₦${Number(v).toLocaleString()}`).join(", ");
+    } else if (value !== undefined && value !== null) {
+      return `₦${Number(value).toLocaleString()}`;
+    } else {
+      return "-";
+    }
+  }}
 />
           <Legend />
           <Bar dataKey="revenue" fill="#d4af37" radius={[6, 6, 0, 0]} />
