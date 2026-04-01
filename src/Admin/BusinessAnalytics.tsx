@@ -19,6 +19,38 @@ import "./Css/BusinessAnalytics.css";
 import { API_BASE } from "../Config/api";
 
 
+interface RevenueDay {
+  day: string;
+  revenue: number;
+}
+
+interface HourlyRevenue {
+  hour: string;
+  revenue: number;
+}
+
+interface OrderType {
+  name: string;
+  value: number;
+}
+
+interface TopItem {
+  name: string;
+  sales: number;
+}
+
+interface OrderItem {
+  name: string;
+  qty: number;
+}
+
+interface Order {
+  info: {
+    order_type: string;
+  };
+  items: OrderItem[];
+}
+
 const COLORS = ["#d4af37", "#111", "#a0522d"];
 
 export default function BusinessIntelligence() {
