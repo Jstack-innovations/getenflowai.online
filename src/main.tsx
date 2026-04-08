@@ -19,6 +19,14 @@ import Offers from "./Admin/Offers.tsx";
 import Banner from "./Admin/Banner.tsx";
 import BusinessAnalytics from "./Admin/BusinessAnalytics.tsx";
 
+
+
+import Plans from "./Admin/Plans/Plans.tsx";
+import CheckoutPage from "./Admin/Plans/CheckoutPage.tsx";
+import SubscriptionPayment from "./Admin/Plans/SubscriptionPayment.tsx";
+import SubscriptionSuccess from "./Admin/Plans/SubscriptionSuccess.tsx";
+
+
 const root = document.getElementById("root");
 
 if (root) {
@@ -44,6 +52,14 @@ if (root) {
           <Route path="/offers" element={<Offers />} />
           <Route path="/banners" element={<Banner />} />
           <Route path="/analytics" element={<BusinessAnalytics />} />
+
+
+
+          <Route path="/plan" element={<Plans />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/planpayment" element={<SubscriptionPayment />} />
+          <Route path="/plansuccess" element={<SubscriptionSuccess />} />
+
 
         </Routes>
       </BrowserRouter>
