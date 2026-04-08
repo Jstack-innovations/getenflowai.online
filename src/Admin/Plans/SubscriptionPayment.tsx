@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { API_BASE } from "../Config/api";
+import { API_BASE } from "../../Config/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Css/Subscription.css";
 
