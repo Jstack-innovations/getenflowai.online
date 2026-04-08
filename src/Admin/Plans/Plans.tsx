@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./App.css"; // You can style it separately
+import "./Plans.css"; // You can style it separately
 
 type Plan = {
   title: string;
