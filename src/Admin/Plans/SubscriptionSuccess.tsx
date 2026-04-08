@@ -26,7 +26,7 @@ export default function SubscriptionSuccess() {
         <div className="success-section">
           <h3>Plan Details</h3>
           <div className="row"><span>Plan</span><strong>{planTitle}</strong></div>
-          <div className="row"><span>Amount Paid</span><strong>₦{amount}</strong></div>
+          <div className="row"><span>Amount Paid</span><strong>${amount}</strong></div>
           <div className="row"><span>Status</span><strong className="active">Active</strong></div>
           
           {renewal_date && (
