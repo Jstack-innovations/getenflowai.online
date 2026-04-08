@@ -65,24 +65,24 @@ export default function Login() {
 
    <div className="admin-login-wrapper">
 
-     {/* ✅ Subscribe Button at the top */}
-  <div style={{ textAlign: "center", margin: "1rem 0" }}>
-    <button
-      className="btn"
-      onClick={() => navigate("/subscribe")}
-      style={{
-        padding: "0.5rem 1rem",
-        fontSize: "1rem",
-        backgroundColor: "#d6a86a",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        color: "#fff",
-      }}
-    >
-      Subscribe to our Premium Plan
-    </button>
-  </div>
+       {/* Floating Subscribe Button */}
+  <button
+    onClick={() => navigate("/subscribe")}
+    style={{
+      position: "fixed",      // stays on top of everything
+      top: "10px",            // distance from top
+      right: "10px",          // distance from right
+      padding: "0.5rem 1rem",
+      backgroundColor: "#d6a86a",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
+      zIndex: 9999            // ensure it’s above all other elements
+    }}
+  >
+    Subscribe to our Premium Plan
+  </button>
 
      
   <div className="login-box">
