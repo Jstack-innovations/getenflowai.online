@@ -1,0 +1,151 @@
+.success-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ddd, #d1d1d1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.success-card {
+  background: #fff;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.success-header {
+  margin-bottom: 30px;
+}
+
+.success-header h4{
+  color:yellowgreen;
+  font-weight:700;
+}
+
+.success-icon {
+  width: 70px;
+  height: 70px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 15px auto;
+}
+
+.success-subtext {
+  color: #666;
+  margin-top: 5px;
+}
+
+.success-section {
+  text-align: left;
+  margin-bottom: 25px;
+  color:#000;
+}
+
+.success-section h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 5px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.active {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.subscription-code-box {
+  background: #1d1d1d;
+  padding: 15px;
+  border-radius: 12px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.subscription-code-box h5 {
+  margin: 5px 0 0;
+  letter-spacing: 2px;
+  color: #d4af37;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.dashboard-btn, .print-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.dashboard-btn {
+  background: #d4af37;
+  border:2px solid #000;
+  color: #000;
+}
+
+.dashboard-btn:hover {
+  background: #1e40af;
+}
+
+.print-btn {
+  background: #f3f4f6;
+  color: #111;
+}
+
+.print-btn:hover {
+  background: #e5e7eb;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Printable version */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .success-card, .success-card * {
+    visibility: visible;
+  }
+
+  .success-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 20px;
+  }
+
+  .button-group {
+    display: none;
+  }
+}
