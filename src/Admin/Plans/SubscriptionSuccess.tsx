@@ -54,7 +54,7 @@ export default function SubscriptionSuccess() {
         <div className="button-group">
           <button className="dashboard-btn" onClick={() => {
             localStorage.removeItem("subscriptionSuccess");
-            navigate("/", { replace: true });
+            navigate("/plan", { replace: true });
           }}>
             Go to Dashboard
           </button>
