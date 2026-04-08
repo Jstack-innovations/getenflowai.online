@@ -41,7 +41,7 @@ export default function SubscriptionPayment() {
     if (paymentStarted.current) return;
     paymentStarted.current = true;
 
-    window.FlutterwaveCheckout({
+    (window as any).FlutterwaveCheckout({
       public_key: key,
       tx_ref: "SUB_" + Date.now(),
       amount,
