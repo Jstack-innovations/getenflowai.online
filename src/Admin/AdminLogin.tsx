@@ -14,6 +14,8 @@ export default function Login() {
   const [error,setError] = useState("");
   const [admins,setAdmins] = useState<Admin[]>([]);
 
+  const [timeLeft, setTimeLeft] = useState(0);
+
   // Fetch admins
   useEffect(() => {
 
@@ -26,6 +28,50 @@ export default function Login() {
       .catch(err => console.error("Failed to fetch admins:",err));
 
   },[]);
+
+
+
+  useEffect(() => {
+  fetch(`${API_BASE}/countdown`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "active") {
+        const totalSeconds =
+          data.remaining_days * 86400 +
+          data.remaining_hours * 3600 +
+          data.remaining_minutes * 60;
+
+        setTimeLeft(totalSeconds);
+      }
+    })
+    .catch(err => console.error("Countdown fetch failed:", err));
+}, []);
+
+
+
+
+
+  useEffect(() => {
+  if (timeLeft <= 0) return;
+
+  const interval = setInterval(() => {
+    setTimeLeft(prev => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [timeLeft]);
+
+  
+
+
+
+    
 
   const handleSubmit = async (e:React.FormEvent) => {
 
@@ -61,28 +107,49 @@ export default function Login() {
 
   };
 
+ const days = Math.floor(timeLeft / 86400);
+const hours = Math.floor((timeLeft % 86400) / 3600);
+const minutes = Math.floor((timeLeft % 3600) / 60);
+const seconds = timeLeft % 60;
+
   return(
 
    <div className="admin-login-wrapper">
 
-       {/* Floating Subscribe Button */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "10px 20px"
+  }}
+>
+  {/* LEFT — Countdown */}
+  <div
+    style={{
+      fontWeight: "bold",
+      fontSize: "14px",
+      color: "#d6a86a"
+    }}
+  >
+    Free Trial Ends In: {days}d {hours}h {minutes}m {seconds}s
+  </div>
+
+  {/* RIGHT — Subscribe Button */}
   <button
     onClick={() => navigate("/subscribe")}
     style={{
-      position: "fixed",      // stays on top of everything
-      top: "10px",            // distance from top
-      right: "10px",          // distance from right
       padding: "0.5rem 1rem",
       backgroundColor: "#d6a86a",
       color: "#fff",
       border: "none",
       borderRadius: "5px",
-      cursor: "pointer",
-      zIndex: 9999            // ensure it’s above all other elements
+      cursor: "pointer"
     }}
   >
-    Subscribe to our Premium Plan
+    Subscribe to Premium Plan
   </button>
+</div>
 
      
   <div className="login-box">
