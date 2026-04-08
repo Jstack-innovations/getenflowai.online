@@ -118,10 +118,16 @@ const seconds = timeLeft % 60;
 
 <div
   style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "10px 20px"
+    padding: "10px 30px",
+    background: "rgba(0,0,0,0.85)",
+    zIndex: 9999
   }}
 >
   {/* LEFT — Countdown */}
