@@ -103,7 +103,7 @@ export default function SubscriptionPayment() {
         }
       },
       onclose: function () {
-        navigate("/", { replace: true });
+        navigate("/plan", { replace: true });
       }
     });
   }
