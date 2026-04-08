@@ -57,8 +57,8 @@ if (root) {
 
           <Route path="/plan" element={<Plans />} />
           <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/planpayment" element={<SubscriptionPayment />} />
-          <Route path="/plansuccess" element={<SubscriptionSuccess />} />
+          <Route path="/subscription-payment" element={<SubscriptionPayment />} />
+          <Route path="/subscriptionSuccess" element={<SubscriptionSuccess />} />
 
 
         </Routes>
