@@ -64,6 +64,27 @@ export default function Login() {
   return(
 
    <div className="admin-login-wrapper">
+
+     {/* ✅ Subscribe Button at the top */}
+  <div style={{ textAlign: "center", margin: "1rem 0" }}>
+    <button
+      className="btn"
+      onClick={() => navigate("/subscribe")}
+      style={{
+        padding: "0.5rem 1rem",
+        fontSize: "1rem",
+        backgroundColor: "#d6a86a",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        color: "#fff",
+      }}
+    >
+      Subscribe to our Premium Plan
+    </button>
+  </div>
+
+     
   <div className="login-box">
     <div className="brand">ARTISAN <span>GRILLS</span></div>
     {error && <div className="error">{error}</div>}
