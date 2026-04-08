@@ -265,7 +265,7 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
 
   <div className="bi-card">
     <h4>Total Revenue</h4>
-    <p>₦{grossRevenue.toLocaleString()}</p> {/* backend total revenue */}
+    <p>${grossRevenue.toLocaleString()}</p> {/* backend total revenue */}
     <span className="positive">
       {salesChangePercent >= 0 
         ? `+${salesChangePercent.toFixed(1)}%` 
@@ -282,24 +282,24 @@ const profitMargin = grossRevenue ? (estimatedProfit / grossRevenue) * 100 : 0;
   <div className="bi-card">
     <h4>Average Order Value</h4>
     <p>
-      ₦{ordersToday ? Math.round(grossRevenue / ordersToday).toLocaleString() : 0}
+      ${ordersToday ? Math.round(grossRevenue / ordersToday).toLocaleString() : 0}
     </p>
     <span className="positive">+5%</span>
   </div>
 
   <div className="bi-card">
     <h4>Gross Revenue</h4>
-    <p>₦{grossRevenue.toLocaleString()}</p>
+    <p>${grossRevenue.toLocaleString()}</p>
   </div>
 
   <div className="bi-card">
     <h4>Estimated Cost</h4>
-    <p>₦{estimatedCost.toLocaleString()}</p>
+    <p>${estimatedCost.toLocaleString()}</p>
   </div>
 
   <div className="bi-card">
     <h4>Estimated Profit</h4>
-    <p>₦{estimatedProfit.toLocaleString()}</p>
+    <p>${estimatedProfit.toLocaleString()}</p>
   </div>
 
   <div className="bi-card">
