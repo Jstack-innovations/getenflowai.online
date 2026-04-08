@@ -45,7 +45,7 @@ export default function SubscriptionPayment() {
       public_key: key,
       tx_ref: "SUB_" + Date.now(),
       amount,
-      currency: "NGN",
+      currency: "USD",
       payment_options: "card,banktransfer,ussd",
       customer: {
         email: formData.email,
