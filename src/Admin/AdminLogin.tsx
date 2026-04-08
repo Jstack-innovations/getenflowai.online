@@ -143,7 +143,7 @@ const seconds = timeLeft % 60;
 
   {/* RIGHT — Subscribe Button */}
   <button
-    onClick={() => navigate("/subscribe")}
+    onClick={() => navigate("/plan")}
     style={{
       padding: "0.5rem 1rem",
       backgroundColor: "#d6a86a",
