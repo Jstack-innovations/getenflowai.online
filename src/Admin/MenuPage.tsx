@@ -11,7 +11,8 @@ type MenuItem = {
   image: string;
   tags: string[];
   badge?: string;
-  available: boolean;
+  available: number;
+  stock: number;
 };
 
 type Menu = Record<string, MenuItem[]>;
@@ -28,6 +29,7 @@ export default function MenuPage() {
     tags: "",
     badge: "",
     available: "1",
+    stock: "",
   });
   const [hamburgerActive, setHamburgerActive] = useState(false);
 
@@ -66,6 +68,8 @@ const handleAdd = async (e: React.FormEvent) => {
       tags: form.tags.split(","),
       badge: form.badge,
       available: form.available === "1",
+      stock: form.stock,
+
     }),
   });
 
@@ -94,6 +98,8 @@ const handleUpdate = async (category: string, item: MenuItem) => {
       tags: item.tags,
       badge: item.badge,
       available: item.available,
+      stock: form.stock,
+
     }),
   });
 
