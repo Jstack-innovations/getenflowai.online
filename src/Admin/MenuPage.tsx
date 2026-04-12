@@ -67,7 +67,7 @@ const handleAdd = async (e: React.FormEvent) => {
       tags: form.tags.split(","),
       badge: form.badge,
       available: form.available === "1",
-      stock: form.stock,
+      stock: item.stock,
 
     }),
   });
@@ -339,6 +339,16 @@ const handleDelete = async (category: string, id: number) => {
                       <option value="1">Available</option>
                       <option value="0">Not Available</option>
                     </select>
+  <input
+    type="number"
+    value={item.stock}
+    onChange={(e) => {
+      const newItems = menu[category].map((i) =>
+        i.id === item.id ? { ...i, stock: parseInt(e.target.value) } : i
+      );
+      setMenu({ ...menu, [category]: newItems });
+    }}
+  />
                     <button
                       className="btn"
                       onClick={() => handleUpdate(category, item)}
