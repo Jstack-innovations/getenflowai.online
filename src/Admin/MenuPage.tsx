@@ -67,7 +67,7 @@ const handleAdd = async (e: React.FormEvent) => {
       tags: form.tags.split(","),
       badge: form.badge,
       available: form.available === "1",
-      stock: item.stock,
+      stock: form.stock,
 
     }),
   });
@@ -97,7 +97,7 @@ const handleUpdate = async (category: string, item: MenuItem) => {
       tags: item.tags,
       badge: item.badge,
       available: item.available,
-      stock: form.stock,
+      stock: item.stock,
 
     }),
   });
