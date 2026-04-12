@@ -11,10 +11,9 @@ type MenuItem = {
   image: string;
   tags: string[];
   badge?: string;
-  available: number;
+  available: number | boolean;
   stock: number;
 };
-
 type Menu = Record<string, MenuItem[]>;
 
 export default function MenuPage() {
