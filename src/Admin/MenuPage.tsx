@@ -247,7 +247,10 @@ const handleDelete = async (category: string, id: number) => {
                   <p><strong>Price:</strong> ${item.price}</p>
                   <p><strong>Tags:</strong> {item.tags.join(", ")}</p>
                   <p><strong>Badge:</strong> {item.badge ?? "—"}</p>
-                  <p><strong>Available:</strong> {item.available ? "Yes" : "No"}</p>
+                  <p><strong>Stock:</strong> {item.stock} 
+                    <br />
+                  <strong>Available:</strong> {item.available ? "Yes" : "No"}
+                  </p>
 
                   {/* Editable fields */}
                   <div className="form-row">
