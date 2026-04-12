@@ -231,7 +231,14 @@ const handleDelete = async (category: string, id: number) => {
               >
                 <option value="1">Available</option>
                 <option value="0">Not Available</option>
-              </select>
+              </select>          
+  <input
+    type="number"
+    placeholder="Stock"
+    value={form.stock}
+    onChange={(e) => setForm({ ...form, stock: e.target.value })}
+    required
+  />
             </div>
 
             <button className="btn" type="submit">
