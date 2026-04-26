@@ -1,2 +1,2 @@
 export const API_BASE =
-"https://artisangrills-production.up.railway.app";
+"https://artisangrills.onrender.com";
