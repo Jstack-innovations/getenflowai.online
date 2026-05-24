@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { API_BASE } from "../../Config/enflowApi";
+import { API_BASE } from "../Config/enflowApi";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
