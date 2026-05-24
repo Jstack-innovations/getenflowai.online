@@ -115,6 +115,47 @@ select {
   transform: translateY(-1px);
 }
 
+/* Grid */
+.reservations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-top: 16px;
+}
+
+/* Card */
+.reservation-card {
+  background: linear-gradient(180deg, #160c07 0%, #0e0703 100%);
+  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid rgba(255,238,215,0.1);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.35);
+}
+
+.reservation-card img {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.form-row input,
+.form-row select {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: #1e1008;
+  color: white;
+}
+
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;

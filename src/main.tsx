@@ -22,9 +22,17 @@ import BusinessAnalytics from "./Admin/BusinessAnalytics.tsx";
 
 
 import Plans from "./Admin/Plans/Plans.tsx";
+import TrialSignup from "./Admin/Plans/TrialSignup.tsx";
 import CheckoutPage from "./Admin/Plans/CheckoutPage.tsx";
 import SubscriptionPayment from "./Admin/Plans/SubscriptionPayment.tsx";
 import SubscriptionSuccess from "./Admin/Plans/SubscriptionSuccess.tsx";
+import ZaraTopup from "./Admin/Plans/ZaraTopup/ZaraTopup.tsx";
+
+
+
+
+import Kds from "./KDS/Kds.tsx";
+
 
 
 const root = document.getElementById("root");
@@ -56,9 +64,16 @@ if (root) {
 
 
           <Route path="/plan" element={<Plans />} />
+          <Route path="/trial-signup" element={<TrialSignup />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/subscription-payment" element={<SubscriptionPayment />} />
           <Route path="/subscriptionSuccess" element={<SubscriptionSuccess />} />
+          <Route path="/zara-topup" element={<ZaraTopup />} />
+          
+          
+          
+          
+          <Route path="/kds" element={<Kds />} />
 
 
         </Routes>

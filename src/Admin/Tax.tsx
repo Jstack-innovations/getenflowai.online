@@ -18,23 +18,22 @@ export default function TaxPage() {
   });  
   
   // ✅ Guarded GET
-  const fetchTax = async () => {  
-    try {
-      const res = await fetch(`${API_BASE}/getTax`, {
-        credentials: "include",
-      });  
-      const data = await res.json();  
+  const [authChecked, setAuthChecked] = useState(false);
 
-      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      setTax(data);  
-    } catch (err) {
-      console.error("Failed to fetch tax:", err);
+const fetchTax = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/getTax`, { credentials: "include" });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
     }
-  };  
+    setTax(data);
+    setAuthChecked(true);
+  } catch (err) {
+    console.error("Failed to fetch tax:", err);
+  }
+};
   
   useEffect(() => {  
     fetchTax();  
@@ -91,8 +90,10 @@ export default function TaxPage() {
     }
   };  
   
-  return (  
-    <div className="tax-page">  
+  if (!authChecked) return null;
+
+return (
+  <div className="tax-page">
       <div className="tax-container">  
         <h1>Tax Management</h1>  
 

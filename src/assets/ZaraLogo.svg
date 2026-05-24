@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="cg" cx="40%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#facc15"/>
+      <stop offset="35%" stop-color="#d6a86a"/>
+      <stop offset="70%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#7a3a10"/>
+    </radialGradient>
+    <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#facc15" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#d6a86a" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#f97316" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="60" fill="#100905"/>
+  <circle cx="60" cy="60" r="50" fill="none" stroke="url(#rg)" stroke-width="0.8" opacity="0.5"/>
+  <circle cx="60" cy="60" r="34" fill="url(#cg)" opacity="0.95"/>
+  <ellipse cx="50" cy="48" rx="9" ry="6" fill="white" opacity="0.1"/>
+  <path d="M30 57 Q37 48 44 57 Q51 66 58 57 Q65 48 72 57 Q79 66 86 57 Q90 52 94 57" fill="none" stroke="#facc15" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M30 62 Q38 53 46 62 Q54 71 62 62 Q70 53 78 62 Q84 68 94 62" fill="none" stroke="#d6a86a" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M30 53 Q37 62 44 53 Q51 44 58 53 Q65 62 72 53 Q79 44 86 53 Q90 58 94 53" fill="none" stroke="#fde68a" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+</svg>

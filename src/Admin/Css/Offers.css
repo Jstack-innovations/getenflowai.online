@@ -34,8 +34,9 @@ body{
 }
 
 /* CARD */
-.card {
-  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+.offercard {
+  /*background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);*/
+  background:rgba(0,0,0,0.55);
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 14px;
@@ -46,16 +47,18 @@ body{
 }
 
 /* INPUTS */
-.card input {
+.offercard input {
   padding: 10px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: rgba(0,0,0,0.25);
   color: var(--text);
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.card input::placeholder {
+.offercard input::placeholder {
   color: var(--muted);
 }
 
@@ -97,4 +100,34 @@ button:hover {
   background: linear-gradient(180deg, #5a2e2e 0%, #3f1f1f 100%);
   color: #ffe0e0;
   border: 1px solid rgba(255, 120, 120, 0.2);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+  .offercard {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .title {
+    font-size: 24px;
+  }
 }

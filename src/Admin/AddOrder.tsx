@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddOrder.css";
 import { API_BASE } from "../Config/api";
+
 type Order = {
   name: string;
   phone: string;
@@ -16,6 +17,7 @@ type Order = {
 
 export default function AddOrder() {
   const navigate = useNavigate();
+  const [authChecked, setAuthChecked] = useState(false);
   const [order, setOrder] = useState<Order>({
     name: "",
     phone: "",
@@ -27,53 +29,48 @@ export default function AddOrder() {
     full_address: "",
     plate_order_no: "",
   });
-  
 
+  useEffect(() => {
+    fetch(`${API_BASE}/adminAuthCheck`, { credentials: "include" })
+      .then(r => {
+        if (r.status === 401) navigate("/login", { replace: true });
+        else setAuthChecked(true);
+      })
+      .catch(() => navigate("/login", { replace: true }));
+  }, []);
 
-
-  const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-) => {
-  const { name, value } = e.target;
-
-  setOrder(prev => ({
-    ...prev,
-    [name]: value,
-  }));
-};
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setOrder(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  try {
-    const res = await fetch(`${API_BASE}/adminAddOrder`, {
-      method: "POST",
-      credentials: "include", // send cookies
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(order),
-    });
-
-    const data = await res.json(); // parse JSON
-
-    // Check for status 401 OR error message from backend
-    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-      navigate("/login");
-      return;
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_BASE}/adminAddOrder`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      });
+      const data = await res.json();
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+        navigate("/login");
+        return;
+      }
+      if (data.success) {
+        alert("Order added successfully!");
+        navigate("/");
+      } else {
+        alert("Failed to add order: " + (data.error || "unknown"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error");
     }
+  };
 
-    if (data.success) {
-      alert("Order added successfully!");
-      navigate("/");
-    } else {
-      alert("Failed to add order: " + (data.error || "unknown"));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Network error");
-  }
-};
+  if (!authChecked) return null;
 
   return (
     <div className="wrapper">
@@ -87,7 +84,6 @@ export default function AddOrder() {
           <input name="order_type" placeholder="Order Type" value={order.order_type} onChange={handleChange} required />
           <input name="total_amount" placeholder="Total Amount" value={order.total_amount} onChange={handleChange} required />
           <input name="payment_ref" placeholder="Payment Ref" value={order.payment_ref} onChange={handleChange} />
-          
           <select name="order_status" value={order.order_status} onChange={handleChange} required>
             <option value="Order placed">Order placed</option>
             <option value="Cooking">Cooking</option>
@@ -97,10 +93,8 @@ export default function AddOrder() {
             <option value="Served">Served</option>
             <option value="Picked up">Picked up</option>
           </select>
-
           <input name="full_address" placeholder="Full Address" value={order.full_address} onChange={handleChange} />
           <input name="plate_order_no" placeholder="Plate Order No" value={order.plate_order_no} onChange={handleChange} />
-
           <button className="btn" type="submit">Add Order</button>
         </form>
       </div>

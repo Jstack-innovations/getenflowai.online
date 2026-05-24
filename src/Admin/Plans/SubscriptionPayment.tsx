@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { API_BASE } from "../../Config/api";
+import { API_BASE } from "../../Config/enflowApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Css/Subscription.css";
 
@@ -19,6 +19,11 @@ export default function SubscriptionPayment() {
       try {
         const res = await fetch(`${API_BASE}/flutterwave`);
         const data = await res.json();
+
+        if (!data.publicKey) {
+          alert("Failed to load payment key");
+          return;
+        }
 
         const script = document.createElement("script");
         script.src = "https://checkout.flutterwave.com/v3.js";
@@ -45,66 +50,64 @@ export default function SubscriptionPayment() {
       public_key: key,
       tx_ref: "SUB_" + Date.now(),
       amount,
-      currency: "USD",
-      payment_options: "card,banktransfer,ussd",
+      currency: "NGN",
+      payment_options: "card,banktransfer,ussd,account",
       customer: {
         email: formData.email,
         phone_number: formData.phone,
-        name: formData.fullname
+        name: formData.fullname,
       },
       customizations: {
         title: "Artisan Grill Subscription",
-        description: planTitle
+        description: planTitle,
       },
+
+      // ✅ No status check — send straight to backend just like confirmOrder
       callback: async function (data: any) {
         paymentStarted.current = false;
 
-        if (data.status === "successful") {
-          const payload = {
-            ...formData,
-            plan: planTitle,
-            amount,
-            transaction_id: data.transaction_id
-          };
+        try {
+          const res = await fetch(`${API_BASE}/subPlans`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...formData,
+              plan: planTitle,
+              amount,
+              transaction_id: data.transaction_id,
+            }),
+          });
+          
+        
 
-          try {
-            const res = await fetch(`${API_BASE}/subPlans`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
+          const result = await res.json();
 
-            const result = await res.json();
+          if (result.status === "success") {
+            localStorage.setItem(
+              "subscriptionSuccess",
+              JSON.stringify({
+                planTitle,
+                amount,
+                formData,
+                subscriptionCode: result.subscription_code,
+                renewal_date: result.renewal_date,
+                zara_credits: result.zara_credits, // ← add this
+              })
+            );
 
-            if (result.status === "success") {
-              const subscriptionData = {
-  planTitle,
-  amount,
-  formData,
-  subscriptionCode: result.subscription_code,
-  renewal_date: result.renewal_date // <-- ADD THIS
-};
-
-              localStorage.setItem(
-                "subscriptionSuccess",
-                JSON.stringify(subscriptionData)
-              );
-
-              // ✅ Redirect after storing in localStorage
-              window.location.href = "/subscriptionSuccess";
-            } else {
-              alert("Subscription activation failed");
-            }
-          } catch {
-            alert("Payment succeeded but activation failed");
+            window.location.href = "/subscriptionSuccess";
+          } else {
+            alert(result.message || "Subscription activation failed");
           }
-        } else {
-          alert("Payment Failed ❌");
+        } catch {
+          alert("Payment succeeded but activation failed. Contact support.");
         }
+
       },
+
       onclose: function () {
         navigate("/plan", { replace: true });
-      }
+      },
     });
   }
 
@@ -116,7 +119,7 @@ export default function SubscriptionPayment() {
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#fff",
-        flexDirection: "column"
+        flexDirection: "column",
       }}
     >
       <div className="loader"></div>
@@ -125,4 +128,4 @@ export default function SubscriptionPayment() {
       </p>
     </div>
   );
-        }
+}
