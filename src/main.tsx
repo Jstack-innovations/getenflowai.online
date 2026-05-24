@@ -30,8 +30,7 @@ if (root) {
           
           
           
-          <Route path="/kds" element={<Kds />} />
-
+          
 
         </Routes>
       </BrowserRouter>
