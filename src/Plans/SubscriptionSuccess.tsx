@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ZaraLogo from "../../assets/ZaraLogo.png";
+import ZaraLogo from "../assets/ZaraLogo.png";
 
 export default function SubscriptionSuccess() {
   const navigate = useNavigate();
