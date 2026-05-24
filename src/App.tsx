@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE } from "./Config/enflowApi";
+import "./App.css";
+
 
 type Plan = {
   title: string;
