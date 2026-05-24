@@ -7,10 +7,10 @@ import './index.css'
 import App from './App.tsx'
 
 
-import TrialSignup from "./Admin/Plans/TrialSignup.tsx";
-import CheckoutPage from "./Admin/Plans/CheckoutPage.tsx";
-import SubscriptionPayment from "./Admin/Plans/SubscriptionPayment.tsx";
-import SubscriptionSuccess from "./Admin/Plans/SubscriptionSuccess.tsx";
+import TrialSignup from "./Plans/TrialSignup.tsx";
+import CheckoutPage from "./Plans/CheckoutPage.tsx";
+import SubscriptionPayment from "./Plans/SubscriptionPayment.tsx";
+import SubscriptionSuccess from "./Plans/SubscriptionSuccess.tsx";
 
 
 const root = document.getElementById("root");
