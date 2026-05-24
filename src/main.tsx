@@ -5,34 +5,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import './index.css'
 
 import App from './App.tsx'
-import EditOrder from "./Admin/EditOrder.tsx"
-import AddOrder from "./Admin/AddOrder.tsx"      
-import Tables from "./Admin/Tables.tsx"
-import Tax from "./Admin/Tax.tsx"
-import MenuPage from "./Admin/MenuPage.tsx"
-import ReservationsPage from "./Admin/ReservationsPage.tsx"
-import AdminLogin from "./Admin/AdminLogin.tsx"
-import Logout from "./Admin/Logout.tsx";
-import AdminUsers from "./Admin/AdminUsers.tsx";
-import OrderScanner from "./Admin/OrderScanner.tsx";
-import Offers from "./Admin/Offers.tsx";
-import Banner from "./Admin/Banner.tsx";
-import BusinessAnalytics from "./Admin/BusinessAnalytics.tsx";
 
 
-
-import Plans from "./Admin/Plans/Plans.tsx";
 import TrialSignup from "./Admin/Plans/TrialSignup.tsx";
 import CheckoutPage from "./Admin/Plans/CheckoutPage.tsx";
 import SubscriptionPayment from "./Admin/Plans/SubscriptionPayment.tsx";
 import SubscriptionSuccess from "./Admin/Plans/SubscriptionSuccess.tsx";
-import ZaraTopup from "./Admin/Plans/ZaraTopup/ZaraTopup.tsx";
-
-
-
-
-import Kds from "./KDS/Kds.tsx";
-
 
 
 const root = document.getElementById("root");
@@ -45,31 +23,10 @@ if (root) {
 
           <Route path="/" element={<App />} />
 
-          {/* FIXED: no wrapper needed */}
-          <Route path="/edit-order/:id" element={<EditOrder />} />
-
-          <Route path="/add-order" element={<AddOrder />} />
-          <Route path="/tables" element={<Tables />} />
-          <Route path="/tax" element={<Tax />} />
-          <Route path="/menu" element={<MenuPage />} />
-          <Route path="/check-reservations" element={<ReservationsPage />} />
-          <Route path="/login" element={<AdminLogin />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="/users" element={<AdminUsers />} />
-          <Route path="/scanner" element={<OrderScanner />} />
-          <Route path="/offers" element={<Offers />} />
-          <Route path="/banners" element={<Banner />} />
-          <Route path="/analytics" element={<BusinessAnalytics />} />
-
-
-
-          <Route path="/plan" element={<Plans />} />
           <Route path="/trial-signup" element={<TrialSignup />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/subscription-payment" element={<SubscriptionPayment />} />
           <Route path="/subscriptionSuccess" element={<SubscriptionSuccess />} />
-          <Route path="/zara-topup" element={<ZaraTopup />} />
-          
           
           
           
