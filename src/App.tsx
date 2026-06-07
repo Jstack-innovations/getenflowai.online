@@ -1,336 +1,668 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { API_BASE } from "./Config/enflowApi";
-import "./App.css";
+import {
+  Zap, BarChart2, ShoppingBag, CreditCard, Bell,
+  Globe, ArrowRight, Play, Check, ChevronDown,
+  Bot, TrendingUp, Layers, Shield, Clock, Users,
+  Building2, Smartphone, Lock, Plug, HeadphonesIcon,
+  Star, ChevronUp, Mail, MessageCircle, Globe2,
+  FileText, BookOpen, Activity, Cpu
+} from "lucide-react";
+import './App.css';
 
-
-type Plan = {
-  title: string;
-  subtitle: string;
-  price: string;
-  monthly?: string;
-  period: string;
-  features: string[];
-  cta: string;
-  isContact?: boolean;
-  amount?: number;
-  badge?: string;
-  highlight?: boolean;
-  trialEnabled?: boolean;
-};
-
-type Stat    = { value: string; label: string };
-type Benefit = { icon: string; title: string; desc: string };
-type FAQ     = { q: string; a: string };
-
-type PageData = {
-  plans: Plan[];
-  stats: Stat[];
-  benefits: Benefit[];
-  faqs: FAQ[];
-  trialDays: number;
-};
-
-// Pass this in from your auth context — true only when user is currently on a trial
-const IS_ON_TRIAL = false; // replace with real auth flag e.g. user?.onTrial
-
-function useIntersecting(ref: React.RefObject<Element>, threshold = 0.15) {
-  const [visible, setVisible] = useState(false);
+function useInView(ref, threshold = 0.1) {
+  const [v, setV] = useState(false);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold });
-    obs.observe(el);
-    return () => obs.disconnect();
+    if (!ref.current) return;
+    const o = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setV(true); },
+      { threshold, rootMargin: "0px 0px 0px 0px" }
+    );
+    o.observe(ref.current);
+    return () => o.disconnect();
   }, []);
-  return visible;
+  return v;
 }
 
-function AnimatedSection({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const visible = useIntersecting(ref as React.RefObject<Element>);
+function Reveal({ children, delay = 0, y = 36, style = {}, className = "" }) {
+  const ref = useRef(null);
+  const v = useInView(ref);
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(32px)",
-        transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-      }}
-    >
-      {children}
+    <div ref={ref} className={className} style={{
+      opacity: 1,
+      transform: "translateY(0)",
+      transition: `opacity 0.85s cubic-bezier(.16,1,.3,1) ${delay}ms, transform 0.85s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+      ...style,
+    }}>{children}</div>
+  );
+}
+
+const LOGS = [
+  { tag: "ZARA",        col: "#7c6200", msg: "Good evening. 4 tables active, 2 pending." },
+  { tag: "ORDER #041",  col: "#1a7a3a", msg: "PAID · Table 5 · ₦12,400" },
+  { tag: "STOCK ALERT", col: "#b05a00", msg: "Jollof Rice — 4 portions remaining" },
+  { tag: "ORDER #042",  col: "#1a7a3a", msg: "NEW · Takeout · ₦8,700" },
+  { tag: "PEAK ALERT",  col: "#0050a0", msg: "Rush hour detected — 11 mins away" },
+  { tag: "ORDER #043",  col: "#1a7a3a", msg: "NEW · Table 2 · ₦21,000" },
+  { tag: "ZARA",        col: "#7c6200", msg: "Today's revenue: ₦187,400 · ↑14% vs yesterday" },
+];
+
+function Terminal() {
+  const [lines, setLines] = useState([]);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (idx >= LOGS.length) return;
+    const t = setTimeout(() => { setLines(l => [...l, LOGS[idx]]); setIdx(i => i + 1); }, idx === 0 ? 700 : 950);
+    return () => clearTimeout(t);
+  }, [idx]);
+  return (
+    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, lineHeight: 2, color: "#555" }}>
+      {lines.map((l, i) => (
+        <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+          <span style={{ color: l.col, minWidth: 108, fontSize: 9, letterSpacing: 0.8, paddingTop: 2, flexShrink: 0 }}>{l.tag}</span>
+          <span style={{ color: i === lines.length - 1 ? "#ccc" : "#888" }}>{l.msg}</span>
+        </div>
+      ))}
+      {idx < LOGS.length && (
+        <div style={{ display: "flex", gap: 12 }}>
+          <span style={{ color: "#333", minWidth: 108 }}>···</span>
+          <span style={{ color: "#555" }}>█</span>
+        </div>
+      )}
     </div>
   );
 }
 
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div onClick={() => setOpen(o => !o)} style={{ borderBottom: "1px solid rgba(214,168,106,0.18)", padding: "22px 0", cursor: "pointer" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-        <span style={{ fontSize: 15, fontWeight: 600, color: "#ffffff", fontFamily: "'Cormorant Garamond', serif", letterSpacing: 0.3 }}>{q}</span>
-        <span style={{ fontSize: 18, color: "#d6a86a", flexShrink: 0, transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.3s ease", lineHeight: 1 }}>+</span>
-      </div>
-      <div style={{ maxHeight: open ? 200 : 0, overflow: "hidden", transition: "max-height 0.4s ease" }}>
-        <p style={{ margin: "12px 0 0", fontSize: 13.5, color: "#dddddd", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>{a}</p>
-      </div>
-    </div>
-  );
-}
+const FEATURES_MAIN = [
+  { icon: Bot,        label: "AI Operations",    title: "Zara knows your floor before you do.",        body: "Voice-controlled AI that monitors every order, fires stock alerts, detects peak hours, and briefs management at close — automatically.", stat: "< 3s",  statLabel: "order to kitchen alert" },
+  { icon: BarChart2,  label: "Live Intelligence", title: "Your numbers, updated every second.",          body: "Revenue by hour, item velocity, peak detection, stock burn rate. Not a weekly report — a live operator briefing you act on right now.", stat: "24/7",  statLabel: "live monitoring" },
+  { icon: ShoppingBag,label: "Unified Orders",    title: "Dine-in. Delivery. Takeout. One view.",       body: "Every channel unified in one live dashboard with Flutterwave payment verification, session codes, and pay-later tabs built in.",      stat: "100%", statLabel: "payment verified" },
+];
 
-export default function SubscriptionPage() {
-  const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [pageData, setPageData] = useState<PageData | null>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
+const FEATURE_CARDS = [
+  { icon: CreditCard, title: "Flutterwave Payments", desc: "Pay Now, Pay Later, table sessions. Naira-native. Fully verified." },
+  { icon: Bell,       title: "Multi-Channel Alerts", desc: "Telegram, email, kitchen screen. Every critical event, instantly." },
+  { icon: Globe,      title: "Built for Africa",     desc: "Mobile-first. Naira pricing. Local infrastructure. SME costs." },
+];
+
+const HOW = [
+  { n: "01", icon: Layers,      title: "Onboard in minutes",    desc: "Connect your menu, tables, and payment account. No hardware. No technician. Just a browser." },
+  { n: "02", icon: Bot,         title: "Zara learns your floor", desc: "AI monitors from day one — orders, stock, velocity, staff patterns, and revenue trends." },
+  { n: "03", icon: TrendingUp,  title: "You get total clarity",  desc: "Live dashboards, instant alerts to Telegram and email, and daily Zara briefs so you run the business, not the noise." },
+];
+
+const MARQUEE_ITEMS = ["Artisan Grills", "Lagos SMEs", "Abuja Kitchens", "Port Harcourt", "Enugu Operators", "African Restaurants"];
+
+const STATS = [
+  { val: "₦2.1B+", label: "transactions processed",  sub: "across all clients" },
+  { val: "99.9%",  label: "historical uptime",        sub: "Zara never sleeps" },
+  { val: "< 3s",   label: "order to kitchen alert",   sub: "real-time every time" },
+  { val: "50+",    label: "Nigerian restaurants",     sub: "and growing fast" },
+];
+
+const TESTIMONIALS = [
+  { stars: 5, icon: Users,       quote: "We used to lose track of table orders during peak hours. Zara tells us before it becomes a problem. EnflowAI changed how we run the floor — completely.", name: "Artisan Grills",    role: "Flagship Partner · Lagos, Nigeria" },
+  { stars: 5, icon: ShoppingBag, quote: "The Flutterwave integration alone saved us from so many payment disputes. And Zara's stock alerts? We haven't run out of anything in 3 months.",         name: "CcJitters",         role: "Partner · Abuja, Nigeria" },
+  { stars: 5, icon: TrendingUp,  quote: "EnflowAI gave us visibility we never had before. Revenue tracking, order history, peak detection — all in one place. Worth every kobo.",                 name: "Lagos Kitchen Co.", role: "Client · Lagos Island, Nigeria" },
+];
+
+const ENTERPRISE_CARDS = [
+  { icon: Zap,            title: "Fast Implementation",  desc: "Up and running in under 10 minutes. No hardware. Works on any device with a browser." },
+  { icon: Lock,           title: "Enterprise Security",  desc: "Role-based access, session management, encrypted payments. Protected at every layer." },
+  { icon: Building2,      title: "Multi-Location Ready", desc: "Manage multiple restaurant locations from one dashboard. Unified reporting across all outlets." },
+  { icon: Smartphone,     title: "Mobile First",         desc: "Designed for Nigerian internet conditions. Lightweight, fast, fully functional on any Android." },
+  { icon: HeadphonesIcon, title: "Dedicated Support",    desc: "WhatsApp support, onboarding assistance, and ongoing help from the EnflowAI team." },
+  { icon: Plug,           title: "API & Integrations",   desc: "Connect your existing tools. Flutterwave, Telegram, email, and more integrations coming." },
+];
+
+const FAQS = [
+  { q: "What is EnflowAI and who is it for?",       a: "EnflowAI is an AI-powered restaurant operations platform built for African SMEs. It's for restaurant owners and operators who want enterprise-grade intelligence without enterprise costs." },
+  { q: "Do I need special hardware or equipment?",   a: "No. EnflowAI runs entirely in a web browser. Any smartphone, tablet, or computer with internet access is all you need." },
+  { q: "How does Zara AI work?",                     a: "Zara monitors every order in real-time, fires alerts when stock runs low, detects peak hours, and delivers a full operations brief at end of day. She also responds to voice commands." },
+  { q: "How does the Flutterwave integration work?", a: "EnflowAI integrates directly with Flutterwave. Customers can Pay Now or use Pay Later/table sessions. All transactions verify automatically and reflect instantly in your dashboard." },
+  { q: "Can I cancel anytime?",                      a: "Yes. Cancel anytime with no fees. Your 14-day free trial gives you full access before any payment is required." },
+  { q: "Is my data secure?",                         a: "Yes. Encrypted connections, secure session management, and role-based access control protect your business data and customer payment information at every layer." },
+];
+
+export default function EnflowHome() {
+  const [scroll, setScroll]         = useState(0);
+  const [activeFeat, setActiveFeat] = useState(0);
+  const [openFaq, setOpenFaq]       = useState(0);
+
+
+  useEffect(() => {
+    const onS = () => setScroll(window.scrollY);
+    window.addEventListener("scroll", onS, { passive: true });
+    return () => window.removeEventListener("scroll", onS);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setActiveFeat(f => (f + 1) % FEATURES_MAIN.length), 4200);
+    return () => clearInterval(t);
+  }, []);
+
+  const serif = "'Instrument Serif', Georgia, serif";
+  const sans  = "'Syne', system-ui, sans-serif";
+  const mono  = "'JetBrains Mono', monospace";
+  const nav   = scroll > 50;
+
+  return (
+    <div style={{ background:"#fff", color:"#111", fontFamily: sans, overflowX:"hidden" }}>
+
+      {/* NAV */}
+      <header style={{
+        position:"fixed", top:0, left:0, right:0, zIndex:200, height:62,
+        background: nav ? "rgba(255,255,255,0.96)" : "transparent",
+        backdropFilter: nav ? "blur(20px)" : "none",
+        borderBottom: nav ? "1px solid rgba(0,0,0,0.07)" : "none",
+        transition:"all 0.4s ease",
+        display:"flex", alignItems:"center", padding:"0 48px", justifyContent:"space-between",
+      }}>
+        
+        
+<div style={{ display:"flex", alignItems:"center", gap:10 }}>
+  <img 
+    src={nav ? "https://waitlist.getenflowai.online/assets/darkLogo.png" : "https://waitlist.getenflowai.online/assets/logo.png"}
+    alt="EnflowAI"
+    style={{height:40, objectFit:"contain" }}
+  />
+</div>
+        
+        
+        
+        <nav className="hide-mob" style={{ display:"flex", gap:36 }}>
+          {["Product","Features","How It Works","Enterprise","FAQ"].map(l => (
+            <button key={l} className="nav-item"
+              onClick={() => document.getElementById(l.toLowerCase().replace(/ /g,"-"))?.scrollIntoView({ behavior:"smooth" })}>
+              {l}
+            </button>
+          ))}
+        </nav>
+        <div style={{ display:"flex", gap:10 }}>
+          <button className="btn-ghost" style={{ padding:"8px 18px", fontSize:10 }} onClick={() => window.location.href = "https://signin.getenflowai.online"}>Sign In</button>
+          <button className="btn-black" style={{ padding:"8px 18px", fontSize:10 }} onClick={() => window.location.href = "https://plans.getenflowai.online"}>Get Started</button>
+        </div>
+      </header>
+
+      {/* HERO */}
+        <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", padding:"80px 48px 0" }}>
   
+  {/* VIDEO BACKGROUND */}
+  <video
+  autoPlay
+  muted
+  loop
+  playsInline
+  style={{
+    position:"absolute", top:0, left:0, width:"100%", height:"100%",
+    objectFit:"cover", zIndex:0
+  }}
+>
+  <source src="https://waitlist.getenflowai.online/Video/Hero.mp4" type="video/mp4" />
+</video>
 
-
-  useEffect(() => {
-  Promise.all([
-    fetch(`${API_BASE}/subscriptionContent`).then(r => r.json()),
-    fetch(`${API_BASE}/settings`).then(r => r.json()),
-  ]).then(([content, settings]) => {
-    setPageData({ ...content, trialDays: settings.trial_days });
-  }).catch(err => console.error("Failed to load page content", err));
-}, []);
-
-
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = `
-      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #080502; }
-
-      @keyframes grain {
-        0%, 100% { transform: translate(0, 0); }
-        10% { transform: translate(-2%, -3%); } 20% { transform: translate(3%, 2%); }
-        30% { transform: translate(-1%, 4%); }  40% { transform: translate(4%, -1%); }
-        50% { transform: translate(-3%, 3%); }  60% { transform: translate(2%, -4%); }
-        70% { transform: translate(-4%, 2%); }  80% { transform: translate(3%, -2%); }
-        90% { transform: translate(-2%, 4%); }
-      }
-      @keyframes float-orb {
-        0%, 100% { transform: translateY(0px) scale(1); }
-        50% { transform: translateY(-20px) scale(1.04); }
-      }
-      @keyframes shimmer-line {
-        0%   { transform: translateX(-100%); }
-        100% { transform: translateX(400%); }
-      }
-      @keyframes badge-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(214,168,106,0.4); }
-        50% { box-shadow: 0 0 0 8px rgba(214,168,106,0); }
-      }
-      @keyframes hero-fade {
-        from { opacity: 0; transform: translateY(24px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes trial-pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.6; }
-      }
-      .plan-card { transition: transform 0.35s cubic-bezier(.23,1,.32,1), box-shadow 0.35s ease, border-color 0.35s ease; }
-      .plan-card:hover { transform: translateY(-6px) scale(1.01); }
-      .cta-btn { position: relative; overflow: hidden; transition: all 0.3s ease; }
-      .cta-btn::after {
-        content: ''; position: absolute; top: 0; left: 0; width: 40px; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-        animation: shimmer-line 2.5s infinite;
-      }
-      .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(214,168,106,0.35); }
-      .benefit-icon { transition: transform 0.3s ease; }
-      .benefit-block:hover .benefit-icon { transform: scale(1.15) rotate(-4deg); }
-    `;
-    document.head.appendChild(style);
-    return () => document.head.removeChild(style);
-  }, []);
-
-  const handleCTA = (plan: Plan) => {
-    if (plan.isContact) { window.open("mailto:support@artisan.com", "_blank"); return; }
-    // If plan has trial enabled, route to trial signup; otherwise go to checkout
-    if (plan.trialEnabled) {
-      navigate("/trial-signup", { state: { plan } });
-    } else {
-      navigate("/checkout", { state: { plan } });
-    }
-  };
-
-  const handleHeroTrial = () => navigate("/trial-signup");
-
-  if (!pageData) return (
-    <div style={{ background: "#080502", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "#d6a86a", fontFamily: "'DM Mono', monospace", fontSize: 12, letterSpacing: 3 }}>LOADING...</p>
-    </div>
-  );
-
-  const { plans, stats, benefits, faqs, trialDays } = pageData;
-
-  return (
-    <div style={{ background: "#080502", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", color: "#dddddd", overflowX: "hidden" }}>
-
-      {/* Grain overlay */}
-      <div style={{ position: "fixed", inset: "-50%", zIndex: 1, pointerEvents: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`, animation: "grain 0.5s steps(1) infinite", opacity: 0.4 }} />
-
-      {/* ── HERO ── */}
-      <section ref={heroRef} style={{ position: "relative", minHeight: "92vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-        <video autoPlay muted loop playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.18, zIndex: 0 }}>
-          <source src="https://enflow-ai.vercel.app/Video/Hero.mp4" type="video/mp4" />
-        </video>
-        <div style={{ position: "absolute", top: "10%", left: "5%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(214,168,106,0.10) 0%, transparent 70%)", animation: "float-orb 8s ease-in-out infinite", zIndex: 0 }} />
-        <div style={{ position: "absolute", bottom: "5%", right: "5%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%)", animation: "float-orb 10s ease-in-out infinite reverse", zIndex: 0 }} />
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(214,168,106,0.3), transparent)", zIndex: 2 }} />
-
-        <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 24px", maxWidth: 780, animation: "hero-fade 1s ease both" }}>
-          <div style={{ display: "inline-block", marginBottom: 28, fontSize: 10, fontWeight: 600, letterSpacing: 4, textTransform: "uppercase", color: "#d6a86a", fontFamily: "'DM Mono', monospace", border: "1px solid rgba(214,168,106,0.25)", borderRadius: 100, padding: "6px 20px", background: "rgba(214,168,106,0.05)" }}>
-            Enflow · Africa's First Restaurant Intelligence
-          </div>
-          <h1 style={{ fontSize: "clamp(42px, 7vw, 88px)", fontWeight: 300, lineHeight: 1.05, fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em", marginBottom: 24, color: "#ffffff" }}>
-            Run Smarter.<br /><em style={{ fontStyle: "italic", color: "#d6a86a" }}>Earn More.</em>
-          </h1>
-          <p style={{ fontSize: 16, color: "#dddddd", lineHeight: 1.75, maxWidth: 520, margin: "0 auto 40px", fontWeight: 300 }}>
-            One platform. Every order, every table, every naira — powered by Zara AI. Try free for {trialDays} days, no card needed.
-          </p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="cta-btn" onClick={handleHeroTrial} style={{ padding: "14px 36px", borderRadius: 100, background: "linear-gradient(135deg, #d6a86a, #b8864a)", border: "none", color: "#0c0602", fontSize: 14, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
-              Start {trialDays}-Day Free Trial
-            </button>
-            <button onClick={() => document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" })} style={{ padding: "14px 36px", borderRadius: 100, background: "transparent", border: "1px solid rgba(214,168,106,0.3)", color: "#d6a86a", fontSize: 14, fontWeight: 500, letterSpacing: 1, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.3s" }}>
-              See Plans ↓
-            </button>
-          </div>
-          <p style={{ marginTop: 20, fontSize: 12, color: "#888888", letterSpacing: 1 }}>No credit card required · Cancel anytime · Full access during trial</p>
-        </div>
-        <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, zIndex: 2 }}>
-          <div style={{ width: 1, height: 48, background: "linear-gradient(to bottom, rgba(214,168,106,0.5), transparent)" }} />
-        </div>
-      </section>
-
-      {/* ── STATS BAR ── */}
-      <AnimatedSection>
-        <div style={{ borderTop: "1px solid rgba(214,168,106,0.1)", borderBottom: "1px solid rgba(214,168,106,0.1)", padding: "36px 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 32, maxWidth: 900, margin: "0 auto" }}>
-          {stats.map((s, i) => (
-            <div key={i} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#d6a86a", letterSpacing: -0.5 }}>{s.value}</div>
-              <div style={{ fontSize: 11, color: "#aaaaaa", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+<div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.70)", zIndex:1 }} />
+  
+  
+        <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:72, maxWidth:1280, margin:"0 auto", width:"100%", paddingTop:64, alignItems:"center", position:"relative", zIndex:2 }}>
+          <div style={{ animation:"hero-in 0.9s ease both" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 14px", borderRadius:100, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.15)", marginBottom:32 }}>
+              <div style={{ width:6, height:6, borderRadius:"50%", background:"#6bcf7f", boxShadow:"0 0 8px #6bcf7f", animation:"blink 2s infinite" }} />
+              <span style={{ fontFamily:mono, fontSize:10, color:"#ccc", letterSpacing:2, textTransform:"uppercase" }}>Live — Africa's First Restaurant AI</span>
             </div>
-          ))}
-        </div>
-      </AnimatedSection>
-
-      {/* ── PLANS ── */}
-      <section id="plans" style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-        <AnimatedSection>
-          <div style={{ textAlign: "center", marginBottom: 64 }}>
-            <p style={{ fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: "#d6a86a", fontFamily: "'DM Mono', monospace", marginBottom: 16 }}>Pricing</p>
-            <h2 style={{ fontSize: "clamp(32px, 5vw, 56px)", fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.1, color: "#ffffff" }}>
-              Choose Your <em style={{ fontStyle: "italic", color: "#d6a86a" }}>Plan</em>
-            </h2>
-            <p style={{ marginTop: 16, fontSize: 13, color: "#aaaaaa", letterSpacing: 0.5 }}>
-              All plans include a {trialDays}-day free trial — full access, no credit card.
+            <h1 style={{ fontFamily:serif, fontSize:"clamp(50px,5.5vw,86px)", fontWeight:400, lineHeight:1.04, letterSpacing:"-0.02em", color:"#fff", marginBottom:26 }}>
+              Your Business,<br /><em style={{ fontStyle:"italic", color:"beige" }}>Finally Intelligent.</em>
+            </h1>
+            <p style={{ fontSize:15.5, color:"#ddd", lineHeight:1.85, maxWidth:460, marginBottom:42 }}>
+              EnflowAI gives African SMEs the operational intelligence that was reserved for enterprise — AI automation, live analytics, and Zara, your always-on operations brain.
             </p>
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+              <button className="btn-black" style={{ background:"#fff", color:"#000" }} onClick={() => window.location.href = "https://plans.getenflowai.online/trial-signup"}>Start Free Trial <ArrowRight size={14} /></button>
+              <button className="btn-ghost" style={{ borderColor:"rgba(255,255,255,0.2)", color:"#ccc" }}><Play size={12} /> Watch Demo</button>
+            </div>
+            <div style={{ display:"flex", gap:36, marginTop:52, paddingTop:32, borderTop:"1px solid rgba(255,255,255,0.1)" }}>
+              {[["₦0","Setup cost"],["10-day","Free trial"],["24/7","Zara active"]].map(([v,l]) => (
+                <div key={l}>
+                  <div style={{ fontFamily:serif, fontSize:26, color:"beige" }}>{v}</div>
+                  <div style={{ fontFamily:mono, fontSize:9, color:"#aaa", letterSpacing:1.2, textTransform:"uppercase", marginTop:4 }}>{l}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </AnimatedSection>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20, alignItems: "start" }}>
-          {plans.map((plan, i) => (
-            <AnimatedSection key={i} delay={i * 80}>
-              <div className="plan-card" onMouseEnter={() => setHoveredCard(i)} onMouseLeave={() => setHoveredCard(null)} style={{ position: "relative", background: plan.highlight ? "linear-gradient(160deg, #1a0f07 0%, #0f0804 100%)" : "rgba(255,238,215,0.025)", border: plan.highlight ? "1px solid rgba(214,168,106,0.5)" : hoveredCard === i ? "1px solid rgba(214,168,106,0.25)" : "1px solid rgba(214,168,106,0.1)", borderRadius: 20, padding: "32px 28px", boxShadow: plan.highlight ? "0 0 60px rgba(214,168,106,0.08), inset 0 1px 0 rgba(214,168,106,0.15)" : hoveredCard === i ? "0 20px 60px rgba(0,0,0,0.4)" : "none", cursor: "default" }}>
-                {plan.badge && (
-                  <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, #d6a86a, #b8864a)", color: "#0c0602", fontSize: 9, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", padding: "5px 16px", borderRadius: 100, fontFamily: "'DM Mono', monospace", animation: "badge-pulse 2.5s infinite", whiteSpace: "nowrap" }}>{plan.badge}</div>
-                )}
-                <div style={{ marginBottom: 24 }}>
-                  <p style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#aaaaaa", fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>{plan.subtitle}</p>
-                  <h3 style={{ fontSize: 22, fontWeight: 600, fontFamily: "'Cormorant Garamond', serif", color: "#ffffff", letterSpacing: 0.3 }}>{plan.title}</h3>
+
+          <div style={{ position:"relative", animation:"hero-in 0.9s ease 0.15s both" }}>
+            <div style={{ borderRadius:14, overflow:"hidden", border:"1px solid rgba(255,255,255,0.12)", background:"#111", boxShadow:"0 48px 100px rgba(0,0,0,0.6)" }}>
+              <div style={{ padding:"10px 16px", background:"#1a1a1a", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ display:"flex", gap:6 }}>
+                  {["#e74c3c","#f39c12","#2ecc71"].map(c => <div key={c} style={{ width:10, height:10, borderRadius:"50%", background:c, opacity:0.7 }} />)}
                 </div>
-                <div style={{ marginBottom: 28, paddingBottom: 24, borderBottom: "1px solid rgba(214,168,106,0.1)" }}>
-                  <span style={{ fontSize: plan.isContact ? 28 : "clamp(32px, 4vw, 42px)", fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: plan.highlight ? "#d6a86a" : "#ffffff" }}>{plan.price}</span>
-                  {!plan.isContact && <span style={{ fontSize: 12, color: "#aaaaaa", marginLeft: 4 }}>{plan.period}</span>}
-                  {plan.monthly && <p style={{ fontSize: 11, color: "#bbbbbb", marginTop: 4, fontStyle: "italic" }}>{plan.monthly}</p>}
-                  {/* Trial tag — only on non-contact plans */}
-                  {!plan.isContact && (
-                    <p style={{ marginTop: 10, fontSize: 11, color: "#d6a86a", fontFamily: "'DM Mono', monospace", letterSpacing: 1, animation: "trial-pulse 3s ease-in-out infinite" }}>
-                      ◆ {trialDays}-day free trial included
-                    </p>
-                  )}
+                <div style={{ flex:1, background:"rgba(255,255,255,0.05)", borderRadius:6, padding:"4px 12px", display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ width:7, height:7, borderRadius:"50%", background:"#6bcf7f" }} />
+                  <span style={{ fontFamily:mono, fontSize:10, color:"#666" }}>app.getenflowai.online/dashboard</span>
                 </div>
-                <ul style={{ listStyle: "none", marginBottom: 32, display: "flex", flexDirection: "column", gap: 12 }}>
-                  {plan.features.map((feat, fi) => (
-                    <li key={fi} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.5, color: "#dddddd" }}>
-                      <span style={{ color: "#d6a86a", flexShrink: 0, marginTop: 1, fontSize: 10 }}>◆</span>{feat}
-                    </li>
-                  ))}
-                </ul>
-                <button className="cta-btn" onClick={() => handleCTA(plan)} style={{ width: "100%", padding: "13px 0", borderRadius: 100, background: plan.highlight ? "linear-gradient(135deg, #d6a86a, #b8864a)" : plan.isContact ? "transparent" : "rgba(214,168,106,0.08)", border: plan.highlight ? "none" : "1px solid rgba(214,168,106,0.3)", color: plan.highlight ? "#0c0602" : "#d6a86a", fontSize: 12, fontWeight: plan.highlight ? 700 : 600, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
-                  {plan.isContact ? plan.cta : `Try Free · ${plan.cta}`}
-                </button>
               </div>
-            </AnimatedSection>
-          ))}
+              <div style={{ padding:"20px 22px", minHeight:370 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+                  <div>
+                    <div style={{ fontFamily:mono, fontSize:9, color:"#666", letterSpacing:1, textTransform:"uppercase" }}>Good Evening</div>
+                    <div style={{ fontFamily:serif, fontSize:17, color:"#fff", marginTop:2 }}>Artisan Grills</div>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:6, background:"rgba(107,207,127,0.1)", border:"1px solid rgba(107,207,127,0.22)" }}>
+                    <Bot size={11} color="#6bcf7f" />
+                    <span style={{ fontFamily:mono, fontSize:9, color:"#6bcf7f", letterSpacing:1 }}>ZARA ACTIVE</span>
+                  </div>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:16 }}>
+                  {[
+                    { label:"Revenue Today", value:"₦187,400", delta:"+14%",          col:"beige",   Icon:TrendingUp },
+                    { label:"Active Orders",  value:"7",         delta:"4 tables",     col:"#6bcf7f", Icon:ShoppingBag },
+                    { label:"Avg Order",      value:"₦12,800",   delta:"↑ vs last wk", col:"#74b9ff", Icon:BarChart2 },
+                  ].map((s,i) => (
+                    <div key={i} style={{ padding:12, borderRadius:8, background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                        <span style={{ fontFamily:mono, fontSize:8, color:"#666", letterSpacing:0.8, textTransform:"uppercase" }}>{s.label}</span>
+                        <s.Icon size={10} color={s.col} />
+                      </div>
+                      <div style={{ fontFamily:serif, fontSize:18, color:s.col }}>{s.value}</div>
+                      <div style={{ fontFamily:mono, fontSize:8, color:"#666", marginTop:3 }}>{s.delta}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ borderRadius:8, background:"#0a0a0a", border:"1px solid rgba(255,255,255,0.07)", padding:"12px 14px" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:8, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                    <Bot size={11} color="#ccc" />
+                    <span style={{ fontFamily:mono, fontSize:9, color:"#ccc", letterSpacing:1.5 }}>ZARA OPERATIONS LOG</span>
+                  </div>
+                  <Terminal />
+                </div>
+              </div>
+            </div>
+            <div className="hide-mob" style={{ position:"absolute", top:"8%", right:"-8%", padding:"10px 14px", borderRadius:10, background:"rgba(10,10,10,0.96)", border:"1px solid rgba(107,207,127,0.25)", backdropFilter:"blur(16px)", animation:"float-med 6s ease-in-out infinite" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                <ShoppingBag size={10} color="#6bcf7f" />
+                <span style={{ fontFamily:mono, fontSize:9, color:"#6bcf7f", letterSpacing:0.8 }}>ORDER #044 PAID</span>
+              </div>
+              <div style={{ fontFamily:serif, fontSize:14, color:"#fff" }}>₦9,200 · Table 3</div>
+            </div>
+            <div className="hide-mob" style={{ position:"absolute", bottom:"10%", left:"-9%", padding:"10px 14px", borderRadius:10, background:"rgba(10,10,10,0.96)", border:"1px solid rgba(255,255,255,0.15)", backdropFilter:"blur(16px)", animation:"float-slow 8s ease-in-out infinite reverse" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                <Zap size={10} color="#ccc" />
+                <span style={{ fontFamily:mono, fontSize:9, color:"#ccc", letterSpacing:0.8 }}>ZARA ALERT</span>
+              </div>
+              <div style={{ fontFamily:serif, fontSize:13, color:"#fff" }}>Peak hour in 8 min</div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── BENEFITS ── */}
-      <section style={{ padding: "80px 24px", borderTop: "1px solid rgba(214,168,106,0.08)" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <AnimatedSection>
-            <div style={{ textAlign: "center", marginBottom: 64 }}>
-              <p style={{ fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: "#d6a86a", fontFamily: "'DM Mono', monospace", marginBottom: 16 }}>Why Upgrade</p>
-              <h2 style={{ fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#ffffff" }}>
-                Built for <em style={{ fontStyle: "italic", color: "#d6a86a" }}>Operators</em>
-              </h2>
+      {/* MARQUEE */}
+      <div style={{ borderTop:"1px solid rgba(0,0,0,0.07)", borderBottom:"1px solid rgba(0,0,0,0.07)", padding:"16px 0", overflow:"hidden", background:"#f6f6f4" }}>
+        <div className="marquee-track">
+          {[...MARQUEE_ITEMS,...MARQUEE_ITEMS].map((l,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:72, flexShrink:0 }}>
+              <span style={{ fontFamily:mono, fontSize:10, color:"#aaa", letterSpacing:2.5, textTransform:"uppercase" }}>{l}</span>
+              <span style={{ color:"rgba(0,0,0,0.15)", fontSize:8 }}>◆</span>
             </div>
-          </AnimatedSection>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
-            {benefits.map((b, i) => (
-              <AnimatedSection key={i} delay={i * 100}>
-                <div className="benefit-block" style={{ padding: "36px 32px", border: "1px solid rgba(214,168,106,0.1)", borderRadius: 16, background: "rgba(255,238,215,0.02)", transition: "border-color 0.3s, background 0.3s" }}>
-                  <div className="benefit-icon" style={{ fontSize: 28, color: "#d6a86a", marginBottom: 20 }}>{b.icon}</div>
-                  <h4 style={{ fontSize: 18, fontWeight: 600, fontFamily: "'Cormorant Garamond', serif", marginBottom: 12, color: "#ffffff" }}>{b.title}</h4>
-                  <p style={{ fontSize: 13.5, color: "#dddddd", lineHeight: 1.75 }}>{b.desc}</p>
+          ))}
+        </div>
+      </div>
+
+      {/* STATS */}
+      <div style={{ padding:"80px 48px", background:"#f6f6f4", borderBottom:"1px solid rgba(0,0,0,0.07)" }}>
+        <div className="stats-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:40, maxWidth:1280, margin:"0 auto", textAlign:"center" }}>
+          {STATS.map((s,i) => (
+            <Reveal key={i} delay={i*80}>
+              <div style={{ fontFamily:serif, fontSize:"clamp(36px,4vw,56px)", color:"#111", lineHeight:1, marginBottom:10 }}>{s.val}</div>
+              <div style={{ fontSize:13, color:"#555", lineHeight:1.6 }}>{s.label}</div>
+              <div style={{ fontFamily:mono, fontSize:10, color:"#aaa", marginTop:4, letterSpacing:0.5 }}>{s.sub}</div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+
+      {/* PLATFORM */}
+      <section id="product" style={{ padding:"130px 48px", maxWidth:1280, margin:"0 auto" }}>
+        <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1.15fr", gap:96, alignItems:"center" }}>
+          <Reveal>
+            <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#555", textTransform:"uppercase", marginBottom:20 }}>The Platform</p>
+            <h2 style={{ fontFamily:serif, fontSize:"clamp(34px,3.8vw,56px)", fontWeight:400, lineHeight:1.1, color:"#111", marginBottom:24 }}>
+              One Platform.<br /><em>Every Operation.</em>
+            </h2>
+            <p style={{ fontSize:14.5, color:"#555", lineHeight:1.9, marginBottom:18 }}>
+              EnflowAI is Africa's first vertical AI SaaS that gives SMEs enterprise-grade operational intelligence — replacing scattered WhatsApp groups, paper logs, and guesswork with one unified platform.
+            </p>
+            <p style={{ fontSize:14.5, color:"#555", lineHeight:1.9, marginBottom:36 }}>
+              Artisan Grills runs their entire restaurant floor on EnflowAI: orders, payments, kitchen comms, reservations, stock, and Zara AI. That's the proof of concept. And it works.
+            </p>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              {["Orders, tables, payments — one unified view","Zara AI monitors your floor 24/7","Telegram + email alerts, zero manual effort","Built for naira, built for Lagos, built for Africa"].map((item,i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:12 }}>
+                  <div style={{ width:20, height:20, borderRadius:"50%", background:"#111", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <Check size={10} color="#fff" strokeWidth={2.5} />
+                  </div>
+                  <span style={{ fontSize:13.5, color:"#555" }}>{item}</span>
                 </div>
-              </AnimatedSection>
+              ))}
+            </div>
+          </Reveal>
+          <Reveal delay={120}>
+            <div>
+              {FEATURES_MAIN.map((f,i) => {
+                const Icon = f.icon;
+                const isActive = activeFeat === i;
+                return (
+                  <div key={i} className="feat-tab" onClick={() => setActiveFeat(i)}
+                    style={{ borderLeft: isActive ? "2px solid #000" : "2px solid transparent", paddingLeft: isActive ? 20 : 0, transition:"all 0.35s ease" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom: isActive ? 10 : 0 }}>
+                      <Icon size={16} color={isActive ? "#111" : "#bbb"} strokeWidth={1.8} style={{ flexShrink:0 }} />
+                      <div style={{ flex:1 }}>
+                        <p style={{ fontFamily:mono, fontSize:9, color: isActive ? "#555" : "#bbb", letterSpacing:2, textTransform:"uppercase", marginBottom:4 }}>{f.label}</p>
+                        <h3 style={{ fontFamily:serif, fontSize:19, color: isActive ? "#111" : "#bbb", lineHeight:1.25 }}>{f.title}</h3>
+                      </div>
+                      <ChevronDown size={14} color="#bbb" style={{ transform: isActive ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.3s", flexShrink:0 }} />
+                    </div>
+                    <div style={{ maxHeight: isActive ? 200 : 0, overflow:"hidden", transition:"max-height 0.42s ease", paddingLeft:28 }}>
+                      <p style={{ fontSize:13.5, color:"#555", lineHeight:1.85, marginBottom:14, paddingTop:4 }}>{f.body}</p>
+                      <div style={{ display:"inline-flex", gap:6, alignItems:"baseline" }}>
+                        <span style={{ fontFamily:serif, fontSize:30, color:"#111" }}>{f.stat}</span>
+                        <span style={{ fontFamily:mono, fontSize:9, color:"#aaa", letterSpacing:1 }}>{f.statLabel}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* FEATURES GRID */}
+      <section id="features" style={{ padding:"110px 48px", background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto" }}>
+          <Reveal>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:72, flexWrap:"wrap", gap:20 }}>
+              <div>
+                <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#888", textTransform:"uppercase", marginBottom:16 }}>Everything Included</p>
+                <h2 style={{ fontFamily:serif, fontSize:"clamp(34px,3.8vw,54px)", fontWeight:400, color:"#111", lineHeight:1.1 }}>
+                  Designed for Operators.<br /><em>Not Technologists.</em>
+                </h2>
+              </div>
+              <button className="btn-ghost" style={{ alignSelf:"flex-end" }}>See All Features <ArrowRight size={13} /></button>
+            </div>
+          </Reveal>
+          <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1.35fr 1fr", gap:18, marginBottom:18 }}>
+            <Reveal>
+              <div className="card-hover" style={{ padding:"48px 44px", borderRadius:18, background:"#fff", border:"1px solid rgba(0,0,0,0.1)", height:"100%", display:"flex", flexDirection:"column", justifyContent:"space-between", minHeight:280 }}>
+                <div>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#f0f0ee", border:"1px solid rgba(0,0,0,0.1)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:24 }}>
+                    <Bot size={22} color="#111" strokeWidth={1.6} />
+                  </div>
+                  <h3 style={{ fontFamily:serif, fontSize:28, color:"#111", marginBottom:14, lineHeight:1.2 }}>Zara AI — Your Operations Brain</h3>
+                  <p style={{ fontSize:13.5, color:"#555", lineHeight:1.85, maxWidth:400 }}>Voice-controlled, always-on. Monitors every order, alerts your team before things go wrong, briefs management at close, and learns your floor over time.</p>
+                </div>
+                <div style={{ display:"flex", gap:20, marginTop:36 }}>
+                  {[["Voice Input",Zap],["Auto Alerts",Bell],["Daily Briefs",Clock]].map(([l,Icon]) => (
+                    <div key={l} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      <Icon size={11} color="#555" />
+                      <span style={{ fontFamily:mono, fontSize:9, color:"#888", letterSpacing:1 }}>{l}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+            <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
+              {[
+                { Icon:ShoppingBag, title:"Unified Order Hub",    desc:"Dine-in, delivery, takeout — one real-time view. Every ticket accounted for." },
+                { Icon:CreditCard,  title:"Flutterwave Payments", desc:"Pay Now, Pay Later, table sessions. Verified. Secure. Naira-native." },
+              ].map((f,i) => (
+                <Reveal key={i} delay={i*100} style={{ flex:1 }}>
+                  <div className="card-hover" style={{ padding:"30px 32px", borderRadius:14, background:"#fff", border:"1px solid rgba(0,0,0,0.08)", height:"100%" }}>
+                    <div style={{ width:38, height:38, borderRadius:10, background:"#f0f0ee", border:"1px solid rgba(0,0,0,0.08)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:18 }}>
+                      <f.Icon size={18} color="#111" strokeWidth={1.6} />
+                    </div>
+                    <h3 style={{ fontFamily:serif, fontSize:20, color:"#111", marginBottom:8 }}>{f.title}</h3>
+                    <p style={{ fontSize:13, color:"#555", lineHeight:1.8 }}>{f.desc}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18 }}>
+            {FEATURE_CARDS.map((f,i) => (
+              <Reveal key={i} delay={i*80}>
+                <div className="card-hover" style={{ padding:"30px", borderRadius:14, background:"#fff", border:"1px solid rgba(0,0,0,0.08)" }}>
+                  <div style={{ width:38, height:38, borderRadius:10, background:"#f0f0ee", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:18 }}>
+                    <f.icon size={18} color="#111" strokeWidth={1.6} />
+                  </div>
+                  <h3 style={{ fontFamily:serif, fontSize:20, color:"#111", marginBottom:8 }}>{f.title}</h3>
+                  <p style={{ fontSize:13, color:"#555", lineHeight:1.8 }}>{f.desc}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── TRIAL CTA BAND — only shown when user IS currently on a trial ── */}
-      {IS_ON_TRIAL && (
-        <AnimatedSection>
-          <section style={{ margin: "0 auto 80px", borderRadius: 24, background: "linear-gradient(135deg, #1a0f07, #0f0804)", border: "1px solid rgba(214,168,106,0.2)", padding: "60px 40px", textAlign: "center", position: "relative", overflow: "hidden", maxWidth: 1100 }}>
-            <div style={{ position: "absolute", top: -80, right: -80, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(214,168,106,0.08) 0%, transparent 70%)" }} />
-            <p style={{ fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: "#d6a86a", fontFamily: "'DM Mono', monospace", marginBottom: 16 }}>Your Trial Is Active</p>
-            <h3 style={{ fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", marginBottom: 16, color: "#ffffff" }}>Your {trialDays}-Day Trial Ends Soon</h3>
-            <p style={{ fontSize: 14, color: "#dddddd", marginBottom: 36, maxWidth: 480, margin: "0 auto 36px" }}>Don't lose access to Zara AI, live analytics, and everything that keeps your floor running.</p>
-            <button className="cta-btn" onClick={() => navigate("/payment")} style={{ padding: "15px 48px", borderRadius: 100, background: "linear-gradient(135deg, #d6a86a, #b8864a)", border: "none", color: "#0c0602", fontSize: 13, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
-              Upgrade Now
-            </button>
-          </section>
-        </AnimatedSection>
-      )}
-
-      {/* ── FAQ ── */}
-      <section style={{ padding: "80px 24px", maxWidth: 680, margin: "0 auto" }}>
-        <AnimatedSection>
-          <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <p style={{ fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: "#d6a86a", fontFamily: "'DM Mono', monospace", marginBottom: 16 }}>FAQ</p>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#ffffff" }}>
-              Questions <em style={{ fontStyle: "italic", color: "#d6a86a" }}>Answered</em>
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" style={{ padding:"130px 48px", maxWidth:1280, margin:"0 auto" }}>
+        <Reveal>
+          <div style={{ textAlign:"center", marginBottom:80 }}>
+            <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#888", textTransform:"uppercase", marginBottom:16 }}>How It Works</p>
+            <h2 style={{ fontFamily:serif, fontSize:"clamp(34px,4vw,58px)", fontWeight:400, color:"#111", lineHeight:1.1 }}>
+              From signup to<br /><em>fully automated.</em>
             </h2>
           </div>
-          {faqs.map((f, i) => <FAQItem key={i} q={f.q} a={f.a} />)}
-        </AnimatedSection>
+        </Reveal>
+        <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:2 }}>
+          {HOW.map((s,i) => (
+            <Reveal key={i} delay={i*110}>
+              <div style={{ padding:"48px 40px", background:"#fff", border:"1px solid rgba(0,0,0,0.08)", borderTopColor:"#111", borderTopWidth:2, borderRadius: i===0?"14px 0 0 14px":i===2?"0 14px 14px 0":0 }}>
+                <div style={{ width:40, height:40, borderRadius:10, background:"#f0f0ee", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:24 }}>
+                  <s.icon size={18} color="#111" strokeWidth={1.6} />
+                </div>
+                <div style={{ fontFamily:mono, fontSize:10, color:"#aaa", letterSpacing:2, marginBottom:16 }}>{s.n}</div>
+                <h3 style={{ fontFamily:serif, fontSize:22, color:"#111", marginBottom:14, lineHeight:1.2 }}>{s.title}</h3>
+                <p style={{ fontSize:13.5, color:"#555", lineHeight:1.85 }}>{s.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer style={{ borderTop: "1px solid rgba(214,168,106,0.08)", padding: "32px 24px", textAlign: "center" }}>
-        <p style={{ fontSize: 11, color: "#666666", letterSpacing: 1.5, fontFamily: "'DM Mono', monospace" }}>
-          © 2026 jsTAck innovaTions · ENFLOW · ALL RIGHTS RESERVED
-        </p>
-      </footer>
+      {/* TESTIMONIAL */}
+      <section style={{ padding:"90px 48px", background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)", borderBottom:"1px solid rgba(0,0,0,0.07)" }}>
+        <Reveal>
+          <div style={{ maxWidth:820, margin:"0 auto" }}>
+            <div style={{ display:"grid", gridTemplateColumns:"3px 1fr", gap:44, alignItems:"start" }}>
+              <div style={{ background:"#111", height:"100%", minHeight:110, borderRadius:2 }} />
+              <div>
+                <p style={{ fontFamily:serif, fontSize:"clamp(20px,2.8vw,32px)", fontWeight:400, fontStyle:"italic", color:"#111", lineHeight:1.65, marginBottom:32 }}>
+                  "We used to lose track of table orders during peak hours. Zara tells us before it becomes a problem. EnflowAI changed how we run the floor — completely."
+                </p>
+                <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+                  <div style={{ width:42, height:42, borderRadius:"50%", background:"#f0f0ee", border:"1px solid rgba(0,0,0,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <Users size={18} color="#111" strokeWidth={1.6} />
+                  </div>
+                  <div>
+                    <div style={{ fontFamily:sans, fontWeight:600, fontSize:13, color:"#111" }}>Artisan Grills</div>
+                    <div style={{ fontFamily:mono, fontSize:9, color:"#aaa", letterSpacing:1, marginTop:3 }}>FLAGSHIP PARTNER · LAGOS, NIGERIA</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </section>
 
+      {/* SOCIAL PROOF */}
+      <section style={{ padding:"110px 48px", background:"#fff" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto" }}>
+          <Reveal>
+            <div style={{ textAlign:"center", marginBottom:72 }}>
+              <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#888", textTransform:"uppercase", marginBottom:16 }}>Trusted by Operators</p>
+              <h2 style={{ fontFamily:serif, fontSize:"clamp(34px,4vw,54px)", fontWeight:400, color:"#111", lineHeight:1.1 }}>
+                Powering restaurants<br /><em>across Nigeria.</em>
+              </h2>
+            </div>
+          </Reveal>
+          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20 }}>
+            {TESTIMONIALS.map((t,i) => (
+              <Reveal key={i} delay={i*100}>
+                <div className="card-hover" style={{ padding:32, borderRadius:16, background:"#f6f6f4", border:"1px solid rgba(0,0,0,0.08)", height:"100%", display:"flex", flexDirection:"column", justifyContent:"space-between" }}>
+                  <div>
+                    <div style={{ display:"flex", gap:3, marginBottom:18 }}>
+                      {Array(t.stars).fill(0).map((_,si) => <Star key={si} size={13} color="#111" fill="#111" />)}
+                    </div>
+                    <p style={{ fontFamily:serif, fontSize:16, color:"#555", lineHeight:1.8, fontStyle:"italic", marginBottom:24 }}>"{t.quote}"</p>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                    <div style={{ width:40, height:40, borderRadius:"50%", background:"#e8e8e6", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <t.icon size={16} color="#111" strokeWidth={1.6} />
+                    </div>
+                    <div>
+                      <div style={{ fontFamily:sans, fontWeight:600, fontSize:13, color:"#111" }}>{t.name}</div>
+                      <div style={{ fontFamily:mono, fontSize:9, color:"#aaa", letterSpacing:1, marginTop:2 }}>{t.role}</div>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ENTERPRISE */}
+      <section id="enterprise" style={{ padding:"110px 48px", background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto" }}>
+          <Reveal>
+            <div style={{ textAlign:"center", marginBottom:72 }}>
+              <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#888", textTransform:"uppercase", marginBottom:16 }}>For Every Scale</p>
+              <h2 style={{ fontFamily:serif, fontSize:"clamp(34px,4vw,54px)", fontWeight:400, color:"#111", lineHeight:1.1 }}>
+                From one outlet to<br /><em>a national chain.</em>
+              </h2>
+              <p style={{ fontSize:15, color:"#555", lineHeight:1.85, maxWidth:480, margin:"20px auto 0" }}>
+                EnflowAI grows with your business. One location or multi-city — the infrastructure adapts.
+              </p>
+            </div>
+          </Reveal>
+          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18 }}>
+            {ENTERPRISE_CARDS.map((c,i) => (
+              <Reveal key={i} delay={i*80}>
+                <div className="card-hover" style={{ padding:"36px 32px", borderRadius:16, background:"#fff", border:"1px solid rgba(0,0,0,0.08)" }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:"#f0f0ee", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:20 }}>
+                    <c.icon size={20} color="#111" strokeWidth={1.6} />
+                  </div>
+                  <h3 style={{ fontFamily:serif, fontSize:20, color:"#111", marginBottom:10 }}>{c.title}</h3>
+                  <p style={{ fontSize:13.5, color:"#555", lineHeight:1.85 }}>{c.desc}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" style={{ padding:"110px 48px", background:"#fff" }}>
+        <div style={{ maxWidth:800, margin:"0 auto" }}>
+          <Reveal>
+            <div style={{ textAlign:"center", marginBottom:72 }}>
+              <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#888", textTransform:"uppercase", marginBottom:16 }}>FAQ</p>
+              <h2 style={{ fontFamily:serif, fontSize:"clamp(34px,4vw,54px)", fontWeight:400, color:"#111", lineHeight:1.1 }}>
+                Common questions,<br /><em>answered.</em>
+              </h2>
+            </div>
+          </Reveal>
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            {FAQS.map((f,i) => {
+              const isOpen = openFaq === i;
+              return (
+                <Reveal key={i} delay={i*50}>
+                  <div onClick={() => setOpenFaq(isOpen ? -1 : i)}
+                    style={{ padding:"22px 26px", borderRadius:14, background: isOpen ? "#f6f6f4" : "#fff", border:`1px solid ${isOpen ? "rgba(0,0,0,0.14)" : "rgba(0,0,0,0.08)"}`, cursor:"pointer", transition:"all 0.3s" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <span style={{ fontFamily:sans, fontWeight:600, fontSize:14, color:"#111" }}>{f.q}</span>
+                      {isOpen ? <ChevronUp size={16} color="#111" /> : <ChevronDown size={16} color="#aaa" />}
+                    </div>
+                    <div style={{ maxHeight: isOpen ? 200 : 0, overflow:"hidden", transition:"max-height 0.42s cubic-bezier(.16,1,.3,1)" }}>
+                      <p style={{ paddingTop:14, fontSize:13.5, color:"#555", lineHeight:1.85 }}>{f.a}</p>
+                    </div>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section style={{ padding:"150px 48px", textAlign:"center", position:"relative", overflow:"hidden", background:"#000" }}>
+        <Reveal>
+          <div style={{ maxWidth:680, margin:"0 auto", position:"relative" }}>
+            <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#666", textTransform:"uppercase", marginBottom:24 }}>Start Today</p>
+            <h2 style={{ fontFamily:serif, fontSize:"clamp(48px,7vw,86px)", fontWeight:400, color:"#fff", lineHeight:1.0, marginBottom:26, letterSpacing:"-0.02em" }}>
+              Stop Managing.<br /><em style={{ color:"beige" }}>Start Scaling.</em>
+            </h2>
+            <p style={{ fontSize:15, color:"#ddd", lineHeight:1.85, maxWidth:440, margin:"0 auto 44px" }}>
+              10-day free trial. Full access. No credit card. Cancel anytime.
+            </p>
+            <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+              <button className="btn-black" style={{ padding:"15px 40px", fontSize:12, background:"#fff", color:"#000" }} onClick={() => window.location.href = "https://plans.getenflowai.online/trial-signup"}>Start Free Trial <ArrowRight size={14} /></button>
+              <button className="btn-ghost" style={{ padding:"15px 40px", fontSize:12, borderColor:"rgba(255,255,255,0.2)", color:"#ccc" }} onClick={() => window.location.href = "mailto:sales@getenflowai.online"}>Talk to Sales</button>
+            </div>
+            <p style={{ marginTop:22, fontFamily:mono, fontSize:10, color:"#555", letterSpacing:2 }}>getenflowai.online</p>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={{ borderTop:"1px solid rgba(0,0,0,0.08)", padding:"64px 48px 36px", background:"#f6f6f4" }}>
+        <div className="footer-grid" style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr 1fr 1fr", gap:48, maxWidth:1280, margin:"0 auto", marginBottom:56 }}>
+          <div>
+            <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:18 }}>
+              <div style={{ width:28, height:28, borderRadius:7, background:"#000", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <Zap size={14} color="#fff" strokeWidth={2.5} />
+              </div>
+              <span style={{ fontFamily:serif, fontSize:20, color:"#111" }}>EnflowAI</span>
+            </div>
+            <p style={{ fontSize:13, color:"#aaa", lineHeight:1.75, maxWidth:240, marginBottom:24 }}>
+              Africa's first AI-powered restaurant operations platform. Built in Lagos, for Nigeria, for Africa.
+            </p>
+            <div style={{ display:"flex", gap:12 }}>
+              {[MessageCircle,Mail,Globe2].map((Icon,i) => (
+                <div key={i} style={{ width:36, height:36, borderRadius:9, background:"#efefed", border:"1px solid rgba(0,0,0,0.1)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+                  <Icon size={15} color="#aaa" strokeWidth={1.6} />
+                </div>
+              ))}
+            </div>
+          </div>
+          {[
+            { title:"Product",   links:[["Zara AI",Bot],["Orders",ShoppingBag],["Payments",CreditCard],["Analytics",BarChart2],["Kitchen",Activity]] },
+            { title:"Solutions", links:[["Restaurants",Users],["Cafes",Clock],["Food Courts",Layers],["Enterprise",Building2],["Chains",Globe]] },
+            { title:"Resources", links:[["Docs",FileText],["Blog",BookOpen],["Case Studies",TrendingUp],["Changelog",Cpu],["Status",Shield]] },
+            { title:"Company",   links:[["About",Users],["Contact",Mail],["Telegram",MessageCircle],["Globe2",Globe2],["Privacy",Lock]] },
+          ].map((col,ci) => (
+            <div key={ci}>
+              <p style={{ fontFamily:mono, fontSize:9, fontWeight:700, letterSpacing:2, color:"#888", textTransform:"uppercase", marginBottom:20 }}>{col.title}</p>
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {col.links.map(([label,Icon],li) => (
+                  <a key={li} href="#" style={{ display:"flex", alignItems:"center", gap:8, fontSize:13, color:"#aaa", textDecoration:"none" }}
+                    onMouseEnter={e => e.currentTarget.style.color="#111"}
+                    onMouseLeave={e => e.currentTarget.style.color="#aaa"}>
+                    <Icon size={13} strokeWidth={1.6} />{label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ maxWidth:1280, margin:"0 auto", paddingTop:28, borderTop:"1px solid rgba(0,0,0,0.08)", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
+          <p style={{ fontFamily:mono, fontSize:10, color:"#aaa", letterSpacing:2, textTransform:"uppercase" }}>© 2026 JSTACK Innovations · Lagos, Nigeria</p>
+          <div style={{ display:"flex", gap:28 }}>
+            {["Privacy","Terms","Telegram","Contact"].map(l => (
+              <button key={l} className="nav-item" style={{ fontSize:10 }}>{l}</button>
+            ))}
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
