@@ -123,11 +123,22 @@ const FAQS = [
   { q: "Is my data secure?",                         a: "Yes. Encrypted connections, secure session management, and role-based access control protect your business data and customer payment information at every layer." },
 ];
 
+function useIsMobile() {
+  const [mob, setMob] = useState(window.innerWidth < 900);
+  useEffect(() => {
+    const fn = () => setMob(window.innerWidth < 900);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mob;
+}
+
 export default function EnflowHome() {
   const [scroll, setScroll]         = useState(0);
   const [activeFeat, setActiveFeat] = useState(0);
   const [openFaq, setOpenFaq]       = useState(0);
-
+  const mob = useIsMobile();
+  const hp  = mob ? "20px" : "48px";
 
   useEffect(() => {
     const onS = () => setScroll(window.scrollY);
@@ -155,20 +166,15 @@ export default function EnflowHome() {
         backdropFilter: nav ? "blur(20px)" : "none",
         borderBottom: nav ? "1px solid rgba(0,0,0,0.07)" : "none",
         transition:"all 0.4s ease",
-        display:"flex", alignItems:"center", padding:"0 48px", justifyContent:"space-between",
+        display:"flex", alignItems:"center", padding:`0 ${hp}`, justifyContent:"space-between",
       }}>
-        
-        
-<div style={{ display:"flex", alignItems:"center", gap:10 }}>
-  <img 
-    src={nav ? "https://waitlist.getenflowai.online/assets/darkLogo.png" : "https://waitlist.getenflowai.online/assets/logo.png"}
-    alt="EnflowAI"
-    style={{height:40, objectFit:"contain" }}
-  />
-</div>
-        
-        
-        
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <img
+            src={nav ? "https://waitlist.getenflowai.online/assets/darkLogo.png" : "https://waitlist.getenflowai.online/assets/logo.png"}
+            alt="EnflowAI"
+            style={{height:40, objectFit:"contain" }}
+          />
+        </div>
         <nav className="hide-mob" style={{ display:"flex", gap:36 }}>
           {["Product","Features","How It Works","Enterprise","FAQ"].map(l => (
             <button key={l} className="nav-item"
@@ -184,25 +190,11 @@ export default function EnflowHome() {
       </header>
 
       {/* HERO */}
-        <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", padding:"80px 48px 0" }}>
-  
-  {/* VIDEO BACKGROUND */}
-  <video
-  autoPlay
-  muted
-  loop
-  playsInline
-  style={{
-    position:"absolute", top:0, left:0, width:"100%", height:"100%",
-    objectFit:"cover", zIndex:0
-  }}
->
-  <source src="https://waitlist.getenflowai.online/Video/Hero.mp4" type="video/mp4" />
-</video>
-
-<div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.70)", zIndex:1 }} />
-  
-  
+      <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", padding:`80px ${hp} 0` }}>
+        <video autoPlay muted loop playsInline style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", objectFit:"cover", zIndex:0 }}>
+          <source src="https://waitlist.getenflowai.online/Video/Hero.mp4" type="video/mp4" />
+        </video>
+        <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.70)", zIndex:1 }} />
         <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:72, maxWidth:1280, margin:"0 auto", width:"100%", paddingTop:64, alignItems:"center", position:"relative", zIndex:2 }}>
           <div style={{ animation:"hero-in 0.9s ease both" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 14px", borderRadius:100, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.15)", marginBottom:32 }}>
@@ -228,7 +220,6 @@ export default function EnflowHome() {
               ))}
             </div>
           </div>
-
           <div style={{ position:"relative", animation:"hero-in 0.9s ease 0.15s both" }}>
             <div style={{ borderRadius:14, overflow:"hidden", border:"1px solid rgba(255,255,255,0.12)", background:"#111", boxShadow:"0 48px 100px rgba(0,0,0,0.6)" }}>
               <div style={{ padding:"10px 16px", background:"#1a1a1a", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", gap:10 }}>
@@ -307,7 +298,7 @@ export default function EnflowHome() {
       </div>
 
       {/* STATS */}
-      <div style={{ padding:"80px 48px", background:"#f6f6f4", borderBottom:"1px solid rgba(0,0,0,0.07)" }}>
+      <div style={{ padding:`80px ${hp}`, background:"#f6f6f4", borderBottom:"1px solid rgba(0,0,0,0.07)" }}>
         <div className="stats-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:40, maxWidth:1280, margin:"0 auto", textAlign:"center" }}>
           {STATS.map((s,i) => (
             <Reveal key={i} delay={i*80}>
@@ -320,7 +311,7 @@ export default function EnflowHome() {
       </div>
 
       {/* PLATFORM */}
-      <section id="product" style={{ padding:"130px 48px", maxWidth:1280, margin:"0 auto" }}>
+      <section id="product" style={{ padding:`130px ${hp}`, maxWidth:1280, margin:"0 auto" }}>
         <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1.15fr", gap:96, alignItems:"center" }}>
           <Reveal>
             <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#555", textTransform:"uppercase", marginBottom:20 }}>The Platform</p>
@@ -376,7 +367,7 @@ export default function EnflowHome() {
       </section>
 
       {/* FEATURES GRID */}
-      <section id="features" style={{ padding:"110px 48px", background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)" }}>
+      <section id="features" style={{ padding:`110px ${hp}`, background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)" }}>
         <div style={{ maxWidth:1280, margin:"0 auto" }}>
           <Reveal>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:72, flexWrap:"wrap", gap:20 }}>
@@ -443,7 +434,7 @@ export default function EnflowHome() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" style={{ padding:"130px 48px", maxWidth:1280, margin:"0 auto" }}>
+      <section id="how-it-works" style={{ padding:`130px ${hp}`, maxWidth:1280, margin:"0 auto" }}>
         <Reveal>
           <div style={{ textAlign:"center", marginBottom:80 }}>
             <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#888", textTransform:"uppercase", marginBottom:16 }}>How It Works</p>
@@ -469,7 +460,7 @@ export default function EnflowHome() {
       </section>
 
       {/* TESTIMONIAL */}
-      <section style={{ padding:"90px 48px", background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)", borderBottom:"1px solid rgba(0,0,0,0.07)" }}>
+      <section style={{ padding:`90px ${hp}`, background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)", borderBottom:"1px solid rgba(0,0,0,0.07)" }}>
         <Reveal>
           <div style={{ maxWidth:820, margin:"0 auto" }}>
             <div style={{ display:"grid", gridTemplateColumns:"3px 1fr", gap:44, alignItems:"start" }}>
@@ -494,7 +485,7 @@ export default function EnflowHome() {
       </section>
 
       {/* SOCIAL PROOF */}
-      <section style={{ padding:"110px 48px", background:"#fff" }}>
+      <section style={{ padding:`110px ${hp}`, background:"#fff" }}>
         <div style={{ maxWidth:1280, margin:"0 auto" }}>
           <Reveal>
             <div style={{ textAlign:"center", marginBottom:72 }}>
@@ -531,7 +522,7 @@ export default function EnflowHome() {
       </section>
 
       {/* ENTERPRISE */}
-      <section id="enterprise" style={{ padding:"110px 48px", background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)" }}>
+      <section id="enterprise" style={{ padding:`110px ${hp}`, background:"#f6f6f4", borderTop:"1px solid rgba(0,0,0,0.07)" }}>
         <div style={{ maxWidth:1280, margin:"0 auto" }}>
           <Reveal>
             <div style={{ textAlign:"center", marginBottom:72 }}>
@@ -561,7 +552,7 @@ export default function EnflowHome() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" style={{ padding:"110px 48px", background:"#fff" }}>
+      <section id="faq" style={{ padding:`110px ${hp}`, background:"#fff" }}>
         <div style={{ maxWidth:800, margin:"0 auto" }}>
           <Reveal>
             <div style={{ textAlign:"center", marginBottom:72 }}>
@@ -594,7 +585,7 @@ export default function EnflowHome() {
       </section>
 
       {/* FINAL CTA */}
-      <section style={{ padding:"150px 48px", textAlign:"center", position:"relative", overflow:"hidden", background:"#000" }}>
+      <section style={{ padding:`150px ${hp}`, textAlign:"center", position:"relative", overflow:"hidden", background:"#000" }}>
         <Reveal>
           <div style={{ maxWidth:680, margin:"0 auto", position:"relative" }}>
             <p style={{ fontFamily:mono, fontSize:10, letterSpacing:3, color:"#666", textTransform:"uppercase", marginBottom:24 }}>Start Today</p>
@@ -614,7 +605,7 @@ export default function EnflowHome() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ borderTop:"1px solid rgba(0,0,0,0.08)", padding:"64px 48px 36px", background:"#f6f6f4" }}>
+      <footer style={{ borderTop:"1px solid rgba(0,0,0,0.08)", padding:`64px ${hp} 36px`, background:"#f6f6f4" }}>
         <div className="footer-grid" style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr 1fr 1fr", gap:48, maxWidth:1280, margin:"0 auto", marginBottom:56 }}>
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:18 }}>
