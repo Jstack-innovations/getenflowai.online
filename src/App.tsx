@@ -184,7 +184,7 @@ export default function EnflowHome() {
           ))}
         </nav>
         <div style={{ display:"flex", gap:10 }}>
-          <button className="btn-ghost" style={{ padding:"8px 18px", fontSize:10 }} onClick={() => window.location.href = "https://signin.getenflowai.online"}>Sign In</button>
+          <button className="btn-ghost" style={{ padding:"8px 18px", fontSize:10 }} onClick={() => window.location.href = "https://dashboard.getenflowai.online"}>Sign In</button>
           <button className="btn-black" style={{ padding:"8px 18px", fontSize:10 }} onClick={() => window.location.href = "https://plans.getenflowai.online"}>Get Started</button>
         </div>
       </header>
