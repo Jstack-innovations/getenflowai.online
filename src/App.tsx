@@ -716,9 +716,11 @@ export default function EnflowHome() {
           </div>
         </div>
       </footer>
-    </div>
+  
 
     {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
+
+    </div>
   
   );
 }
