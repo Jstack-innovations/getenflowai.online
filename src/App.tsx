@@ -134,6 +134,7 @@ function useIsMobile() {
 }
 
 
+
 function DemoModal({ onClose }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -181,18 +182,18 @@ function DemoModal({ onClose }) {
             ×
           </button>
         </div>
-        <video
-          controls
-          autoPlay
-          style={{ width: "100%", display: "block", aspectRatio: "16/9", background: "#000" }}
-        >
-          {/* EDIT THIS: point to your actual demo video URL */}
-          <source src="https://waitlist.getenflowai.online/Video/Demo.mp4" type="video/mp4" />
-        </video>
+        <iframe
+          src="https://player.cloudinary.com/embed/?cloud_name=daw8cr3tv&public_id=lv_0_20260605180909_rqwanw&autoplay=true"
+          style={{ width: "100%", aspectRatio: "16/9", display: "block", border: "none" }}
+          allow="autoplay; fullscreen; encrypted-media"
+          allowFullScreen
+        />
       </div>
     </div>
   );
-          }
+              }
+
+
 
 export default function EnflowHome() {
   const [scroll, setScroll]         = useState(0);
