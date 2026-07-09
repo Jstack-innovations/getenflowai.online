@@ -133,10 +133,72 @@ function useIsMobile() {
   return mob;
 }
 
+
+function DemoModal({ onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 500,
+        background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 20, animation: "fadeIn 0.25s ease",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 960, background: "#000",
+          borderRadius: 14, overflow: "hidden",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 48px 100px rgba(0,0,0,0.6)",
+        }}
+      >
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)",
+        }}>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "#ccc", letterSpacing: 2, textTransform: "uppercase" }}>
+            EnflowAI Demo
+          </span>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none", border: "none", color: "#ccc",
+              fontSize: 20, cursor: "pointer", lineHeight: 1, padding: 4,
+            }}
+          >
+            ×
+          </button>
+        </div>
+        <video
+          controls
+          autoPlay
+          style={{ width: "100%", display: "block", aspectRatio: "16/9", background: "#000" }}
+        >
+          {/* EDIT THIS: point to your actual demo video URL */}
+          <source src="https://waitlist.getenflowai.online/Video/Demo.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </div>
+  );
+          }
+
 export default function EnflowHome() {
   const [scroll, setScroll]         = useState(0);
   const [activeFeat, setActiveFeat] = useState(0);
   const [openFaq, setOpenFaq]       = useState(0);
+  const [showDemo, setShowDemo] = useState(false);
   const mob = useIsMobile();
   const hp  = mob ? "20px" : "48px";
 
@@ -209,7 +271,7 @@ export default function EnflowHome() {
             </p>
             <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
               <button className="btn-black" style={{ background:"#fff", color:"#000" }} onClick={() => window.location.href = "https://plans.getenflowai.online/trial-signup"}>Start Free Trial <ArrowRight size={14} /></button>
-              <button className="btn-ghost" style={{ borderColor:"rgba(255,255,255,0.2)", color:"#ccc" }}><Play size={12} /> Watch Demo</button>
+              <button className="btn-ghost" style={{ borderColor:"rgba(255,255,255,0.2)", color:"#ccc" }} onClick={() => setShowDemo(true)}><Play size={12} /> Watch Demo</button>
             </div>
             <div style={{ display:"flex", gap:36, marginTop:52, paddingTop:32, borderTop:"1px solid rgba(255,255,255,0.1)" }}>
               {[["₦0","Setup cost"],["10-day","Free trial"],["24/7","Zara active"]].map(([v,l]) => (
@@ -655,5 +717,8 @@ export default function EnflowHome() {
         </div>
       </footer>
     </div>
+
+    {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
+  
   );
 }
