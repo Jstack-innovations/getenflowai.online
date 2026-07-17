@@ -93,12 +93,11 @@ const HOW = [
 const MARQUEE_ITEMS = ["Artisan Grills", "Lagos SMEs", "Abuja Kitchens", "Port Harcourt", "Enugu Operators", "African Restaurants"];
 
 const STATS = [
-  { val: "₦2.1B+", label: "transactions processed",  sub: "across all clients" },
-  { val: "99.9%",  label: "historical uptime",        sub: "Zara never sleeps" },
-  { val: "< 3s",   label: "order to kitchen alert",   sub: "real-time every time" },
-  { val: "50+",    label: "Nigerian restaurants",     sub: "and growing fast" },
+  { val: "< 3s",         label: "order to kitchen alert", sub: "real-time, every time" },
+  { val: "24/7",         label: "Zara monitoring",        sub: "never sleeps, never misses an order" },
+  { val: "Multi-currency", label: "NGN, USD, and more",   sub: "built for any market" },
+  { val: "Multi-branch",  label: "ready to scale",        sub: "one kitchen or a hundred" },
 ];
-
 const TESTIMONIALS = [
   { stars: 5, icon: Users,       quote: "We used to lose track of table orders during peak hours. Zara tells us before it becomes a problem. EnflowAI changed how we run the floor — completely.", name: "Artisan Grills",    role: "Flagship Partner · Lagos, Nigeria" },
   { stars: 5, icon: ShoppingBag, quote: "The Flutterwave integration alone saved us from so many payment disputes. And Zara's stock alerts? We haven't run out of anything in 3 months.",         name: "CcJitters",         role: "Partner · Abuja, Nigeria" },
